@@ -1,3 +1,10 @@
+import { Buffer } from 'buffer';
+
+// Bundled polyfills for Solana libs (avoid esm.sh in index.html — breaks some prod / CSP setups)
+(window as unknown as { Buffer: typeof Buffer }).Buffer = Buffer;
+(window as unknown as { global: Window }).global = window;
+(window as unknown as { process: { env: Record<string, string> } }).process = { env: {} };
+
 import './index.css';
 import React from 'react';
 import { createRoot } from 'react-dom/client';

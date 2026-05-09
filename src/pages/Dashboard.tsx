@@ -76,11 +76,11 @@ const Dashboard: React.FC = () => {
           </div>
         </div>
 
-        {/* Content */}
-        <div className="flex-1 overflow-hidden">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-full">
+        {/* Content — min-h-0 lets flex children scroll (otherwise panel can collapse to 0 height) */}
+        <div className="flex-1 overflow-hidden min-h-0">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-full min-h-0">
             {activeTab === 'chat' ? (
-              <div className="h-full">{renderContent()}</div>
+              <div className="h-full min-h-0">{renderContent()}</div>
             ) : (
               <div className="py-6 overflow-y-auto h-full">{renderContent()}</div>
             )}
