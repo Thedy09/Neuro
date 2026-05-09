@@ -2,7 +2,7 @@
 
 Application **React Native (Expo SDK 52)** avec **expo-router**, orientée **Solana Devnet** et **Mobile Wallet Adapter** (`@solana-mobile/mobile-wallet-adapter-protocol-web3js`). Elle consomme le **backend FastAPI** du monorepo (bridge LI.FI, agent, vault) via `src/services/api.ts`.
 
-Pour la checklist hackathon (APK, dApp Store, MWA), voir [`../HACKATHON_CHECKLIST.md`](../HACKATHON_CHECKLIST.md) — section *Track Solana Mobile*.
+Pour les exigences **Solana Mobile** (APK, MWA, dApp Store), suivre le règlement officiel du hackathon et les sections ci-dessous dans ce fichier.
 
 ---
 
