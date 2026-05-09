@@ -11,7 +11,7 @@ Coche `[ ]` → `[x]` au fur et à mesure. Adapte selon les **tracks** que vous 
 - [ ] **README** : installation claire (prérequis, `npm install`, backend Python, variables d’environnement, `make`/docker si utilisé)
 - [ ] **Aucun secret** dans le repo (`.env` non versionné ; clés uniquement dans `.env.example` sans valeurs)
 - [ ] **Vidéo démo** : **&lt; 3 minutes**, parcours lisible (son OK, pas seulement capture floue)
-- [ ] **Lien live demo** : URL publique qui charge — voir **[`docs/DEPLOY_DEMO.md`](docs/DEPLOY_DEMO.md)** (Render + Vercel ou Docker) ; tester dans un navigateur “vide” / autre machine
+- [ ] **Lien live demo** : URL publique qui charge (souvent API Render + front Vercel, voir README) ; tester dans un navigateur “vide” / autre machine
 - [ ] **Lien vidéo** : YouTube non listé, Loom, Drive public, etc.
 
 ---

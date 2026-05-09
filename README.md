@@ -131,9 +131,7 @@ src/
 
 ## Démo en ligne (hackathon)
 
-Guide pas à pas (API Render, front Vercel, Docker VPS) : **[`docs/DEPLOY_DEMO.md`](docs/DEPLOY_DEMO.md)**.
-
-Variables essentielles côté build front : **`VITE_API_URL`** = URL HTTPS de ton API. Côté backend : **`CORS_ORIGINS`** doit inclure l’origine exacte du site démo (JSON dans `.env`).
+Déploiement type hackathon : API sur **Render** (ou Railway) avec `PORT`, front sur **Vercel** avec **`VITE_API_URL`** = URL HTTPS de l’API ; dans le backend, **`CORS_ORIGINS`** (JSON dans `.env`) doit lister l’origine exacte du site (ex. `https://….vercel.app`). Fichiers Docker prod : `Dockerfile.web.prod`, `docker-compose.prod.yml`.
 
 ---
 

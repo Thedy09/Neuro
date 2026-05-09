@@ -43,6 +43,9 @@ contracts/target/
 *.log
 contracts/logs/
 
+# Local-only notes (not published)
+docs/DEPLOY_DEMO.md
+
 # IDE / OS
 .idea/
 .vscode/
