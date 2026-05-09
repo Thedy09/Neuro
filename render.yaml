@@ -1,0 +1,14 @@
+# Render Blueprint — crée le service via Dashboard → New → Blueprint,
+# ou ignore ce fichier et crée un Web Service à la main (voir README, section déploiement).
+#
+# Les secrets (ELEVENLABS_*, CORS_ORIGINS, etc.) se configurent dans l’UI Render,
+# pas dans ce fichier.
+
+services:
+  - type: web
+    name: neuro-api
+    runtime: docker
+    plan: free
+    dockerfilePath: ./backend/Dockerfile
+    dockerContext: ./backend
+    healthCheckPath: /health
