@@ -9,6 +9,6 @@ services:
     name: neuro-api
     runtime: docker
     plan: free
-    dockerfilePath: ./backend/Dockerfile
-    dockerContext: ./backend
+    dockerfilePath: backend/Dockerfile
+    dockerContext: backend
     healthCheckPath: /health

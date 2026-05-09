@@ -136,8 +136,10 @@ Déploiement recommandé : **API sur [Render](https://render.com)** + **front su
 ### 1. API (Render)
 
 1. [Render Dashboard](https://dashboard.render.com) → **New +** → **Web Service** → connecter GitHub **`Thedy09/Neuro`**, branche **`main`**.
-2. **Root Directory** : `backend` (important : pas `NEURO X/backend`).
-3. **Runtime** : **Docker** (fichier `backend/Dockerfile`). Render injecte **`PORT`** ; l’image l’utilise déjà.
+2. **Docker / répertoires** — Render refuse `Dockerfile Path` = `.` seul ; utilise **une** des deux configurations :
+   - **A (recommandé)** — **Root Directory** : *vide* (racine du repo). **Dockerfile Path** : `backend/Dockerfile`. Si le formulaire propose **Docker Build Context** : `backend`.
+   - **B** — **Root Directory** : `backend`. **Dockerfile Path** : `Dockerfile` (le fichier `Dockerfile` dans ce dossier, **pas** le point `.`).
+3. **Runtime** : **Docker**. Render injecte **`PORT`** ; l’image l’utilise déjà.
 4. **Health check path** : `/health`.
 5. **Environment** → ajouter les variables (voir `backend/.env.example`, **sans** commiter ton `.env` local) :
    - **`ELEVENLABS_API_KEY`**, **`ELEVENLABS_AGENT_ID`**
