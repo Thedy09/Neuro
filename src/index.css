@@ -1,0 +1,311 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 220 15% 4%;
+    --foreground: 210 20% 95%;
+
+    --card: 220 15% 7%;
+    --card-foreground: 210 20% 95%;
+
+    --popover: 220 15% 7%;
+    --popover-foreground: 210 20% 95%;
+
+    --primary: 187 90% 51%;
+    --primary-foreground: 220 15% 4%;
+
+    --secondary: 220 14% 12%;
+    --secondary-foreground: 210 20% 85%;
+
+    --muted: 220 14% 14%;
+    --muted-foreground: 215 15% 50%;
+
+    --accent: 187 90% 51%;
+    --accent-foreground: 220 15% 4%;
+
+    --destructive: 0 72% 51%;
+    --destructive-foreground: 210 20% 95%;
+
+    --success: 160 72% 46%;
+    --success-foreground: 220 15% 4%;
+
+    --warning: 38 92% 50%;
+    --warning-foreground: 220 15% 4%;
+
+    --border: 220 14% 16%;
+    --input: 220 14% 14%;
+    --ring: 187 90% 51%;
+
+    --radius: 0.75rem;
+
+    --sidebar-background: 220 15% 6%;
+    --sidebar-foreground: 210 20% 85%;
+    --sidebar-primary: 187 90% 51%;
+    --sidebar-primary-foreground: 220 15% 4%;
+    --sidebar-accent: 220 14% 12%;
+    --sidebar-accent-foreground: 210 20% 85%;
+    --sidebar-border: 220 14% 14%;
+    --sidebar-ring: 187 90% 51%;
+
+    --gradient-primary: linear-gradient(135deg, hsl(187 90% 51%) 0%, hsl(199 89% 48%) 100%);
+    --gradient-glow: linear-gradient(135deg, hsl(187 90% 51% / 0.2) 0%, hsl(199 89% 48% / 0.05) 100%);
+    --gradient-card: linear-gradient(145deg, hsl(220 15% 9%) 0%, hsl(220 15% 6%) 100%);
+    --gradient-surface: linear-gradient(180deg, hsl(220 15% 8%) 0%, hsl(220 15% 5%) 100%);
+    --gradient-orb: radial-gradient(circle, hsl(187 90% 51% / 0.6) 0%, hsl(199 89% 48% / 0.2) 50%, transparent 70%);
+
+    --shadow-glow: 0 0 30px hsl(187 90% 51% / 0.15);
+    --shadow-glow-strong: 0 0 60px hsl(187 90% 51% / 0.25);
+    --shadow-card: 0 4px 24px hsl(0 0% 0% / 0.4);
+    --shadow-elevated: 0 8px 40px hsl(0 0% 0% / 0.5);
+
+    --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
+    --font-mono: 'JetBrains Mono', 'Fira Code', monospace;
+
+    --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-spring: all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+}
+
+@layer base {
+  * {
+    border-color: hsl(var(--border));
+  }
+
+  body {
+    background-color: hsl(var(--background));
+    color: hsl(var(--foreground));
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    overflow-x: hidden;
+  }
+
+  ::selection {
+    background-color: hsl(var(--primary) / 0.3);
+    color: hsl(var(--foreground));
+  }
+
+  ::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: hsl(var(--background));
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: hsl(var(--muted));
+    border-radius: 3px;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: hsl(var(--primary) / 0.5);
+  }
+}
+
+@layer components {
+  /* Wallet button overrides */
+  .wallet-adapter-button-trigger,
+  .wallet-adapter-button {
+    background: hsl(var(--secondary)) !important;
+    border: 1px solid hsl(var(--border)) !important;
+    border-radius: var(--radius) !important;
+    font-family: var(--font-sans) !important;
+    font-weight: 500 !important;
+    font-size: 0.875rem !important;
+    color: hsl(var(--foreground)) !important;
+    transition: var(--transition-smooth) !important;
+    padding: 0.5rem 1.25rem !important;
+    height: auto !important;
+  }
+
+  .wallet-adapter-button-trigger:hover,
+  .wallet-adapter-button:hover {
+    background: hsl(var(--muted)) !important;
+    border-color: hsl(var(--primary) / 0.4) !important;
+    box-shadow: var(--shadow-glow) !important;
+  }
+
+  .wallet-adapter-modal-wrapper {
+    background: hsl(var(--card)) !important;
+    border: 1px solid hsl(var(--border)) !important;
+    border-radius: var(--radius) !important;
+  }
+
+  .wallet-adapter-modal-title {
+    color: hsl(var(--foreground)) !important;
+    font-family: var(--font-sans) !important;
+  }
+
+  .wallet-adapter-modal-list li {
+    background: hsl(var(--secondary)) !important;
+    border-radius: calc(var(--radius) - 2px) !important;
+  }
+
+  .wallet-adapter-modal-list li:hover {
+    background: hsl(var(--muted)) !important;
+  }
+
+  /* Glass morphism */
+  .glass {
+    background: hsl(var(--card) / 0.6);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid hsl(var(--border) / 0.5);
+  }
+
+  .glass-strong {
+    background: hsl(var(--card) / 0.8);
+    backdrop-filter: blur(40px);
+    -webkit-backdrop-filter: blur(40px);
+    border: 1px solid hsl(var(--border));
+  }
+
+  /* Glow effects */
+  .glow-primary {
+    box-shadow: var(--shadow-glow);
+  }
+
+  .glow-primary-strong {
+    box-shadow: var(--shadow-glow-strong);
+  }
+
+  .text-glow {
+    text-shadow: 0 0 20px hsl(var(--primary) / 0.5);
+  }
+
+  /* Grid pattern */
+  .grid-pattern {
+    background-image:
+      linear-gradient(hsl(var(--border) / 0.3) 1px, transparent 1px),
+      linear-gradient(90deg, hsl(var(--border) / 0.3) 1px, transparent 1px);
+    background-size: 60px 60px;
+  }
+
+  /* Gradient text */
+  .gradient-text {
+    background: var(--gradient-primary);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  /* Pulse ring animation */
+  .pulse-ring {
+    animation: pulse-ring 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  }
+
+  /* Orb glow */
+  .orb-glow {
+    background: var(--gradient-orb);
+    filter: blur(1px);
+  }
+
+  /* Animated border */
+  .border-glow {
+    position: relative;
+  }
+
+  .border-glow::before {
+    content: '';
+    position: absolute;
+    inset: -1px;
+    border-radius: inherit;
+    padding: 1px;
+    background: var(--gradient-primary);
+    mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    mask-composite: exclude;
+    -webkit-mask-composite: xor;
+    opacity: 0.5;
+    transition: opacity 0.3s;
+  }
+
+  .border-glow:hover::before {
+    opacity: 1;
+  }
+
+  /* Dot pattern */
+  .dot-pattern {
+    background-image: radial-gradient(hsl(var(--border) / 0.5) 1px, transparent 1px);
+    background-size: 20px 20px;
+  }
+
+  /* Scan line */
+  .scan-line::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, hsl(var(--primary) / 0.4), transparent);
+    animation: scan 4s linear infinite;
+  }
+}
+
+@keyframes pulse-ring {
+  0%, 100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.5;
+    transform: scale(1.05);
+  }
+}
+
+@keyframes scan {
+  0% { top: 0; }
+  100% { top: 100%; }
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-8px); }
+}
+
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+@keyframes breathe {
+  0%, 100% { transform: scale(1); opacity: 0.6; }
+  50% { transform: scale(1.15); opacity: 1; }
+}
+
+/* ── Voice session styles ─────────────────────────────────── */
+
+@keyframes voice-pulse {
+  0%, 100% { box-shadow: 0 0 0 0 hsl(var(--primary) / 0.4); }
+  50% { box-shadow: 0 0 0 12px hsl(var(--primary) / 0); }
+}
+
+@keyframes waveform-bar {
+  0%, 100% { transform: scaleY(0.3); }
+  50% { transform: scaleY(1); }
+}
+
+.voice-pulse {
+  animation: voice-pulse 2s ease-in-out infinite;
+}
+
+.voice-waveform-bar {
+  animation: waveform-bar 0.8s ease-in-out infinite;
+}
+
+/* Voice badge shimmer */
+.voice-badge {
+  background: linear-gradient(
+    90deg,
+    hsl(var(--primary) / 0.1) 0%,
+    hsl(var(--primary) / 0.2) 50%,
+    hsl(var(--primary) / 0.1) 100%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 2s linear infinite;
+}

@@ -1,0 +1,54 @@
+# Dependencies
+node_modules/
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.venv/
+venv/
+*.egg-info/
+*.egg
+
+# Environment (secrets)
+.env
+.env.*
+!.env.example
+!**/.env.example
+backend/.env
+mobile/.env
+
+# Certificates & local credentials
+*.pem
+*.p12
+credentials.json
+google-services.json
+GoogleService-Info.plist
+
+# Build outputs
+dist/
+build/
+
+# Solana / Anchor — never commit keypairs or compiler artifacts
+contracts/target/
+**/target/deploy/*.json
+**/*-keypair.json
+**/test-ledger/
+**/*.so
+
+# Logs & misc
+*.log
+contracts/logs/
+
+# IDE / OS
+.idea/
+.vscode/
+*.swp
+.DS_Store
+
+# Expo / React Native
+mobile/.expo/
+mobile/dist/

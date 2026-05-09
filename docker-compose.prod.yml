@@ -1,0 +1,50 @@
+# Production-style stack on une seule machine (VPS ou PC démo).
+# Construire le front avec l’URL publique réelle du backend :
+#
+#   export NEURO_API_PUBLIC=https://ton-api.example.com
+#   docker compose -f docker-compose.prod.yml build --build-arg VITE_API_URL=$NEURO_API_PUBLIC web
+#   docker compose -f docker-compose.prod.yml up -d
+#
+# Côté backend, mets la même origine du site dans CORS_ORIGINS (JSON dans backend/.env).
+
+services:
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: neuro-backend-prod
+    ports:
+      - "8000:8000"
+    env_file:
+      - ./backend/.env
+    environment:
+      - HOST=0.0.0.0
+      - PORT=8000
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "python", "-c", "import httpx; httpx.get('http://127.0.0.1:8000/health')"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    networks:
+      - neuro-network
+
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile.web.prod
+      args:
+        VITE_API_URL: ${NEURO_API_PUBLIC:-http://localhost:8000}
+    container_name: neuro-web-prod
+    ports:
+      - "8080:80"
+    depends_on:
+      backend:
+        condition: service_healthy
+    restart: unless-stopped
+    networks:
+      - neuro-network
+
+networks:
+  neuro-network:
+    driver: bridge
