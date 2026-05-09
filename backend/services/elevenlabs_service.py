@@ -81,9 +81,10 @@ When confirming actions, state the exact amounts, routes, and timing."""
         headers = {"xi-api-key": self._api_key}
 
         try:
+            # websockets 10.x : extra_headers (11+ renomme en additional_headers)
             async with websockets.connect(
                 f"{self.WS_URL}?agent_id={self._agent_id}",
-                additional_headers=headers,
+                extra_headers=list(headers.items()),
                 ping_interval=20,
                 ping_timeout=10,
             ) as ws:
