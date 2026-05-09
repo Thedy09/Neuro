@@ -1,5 +1,13 @@
 {
-  "buildCommand": "npm run build",
-  "outputDirectory": "dist",
-  "rewrites": [{ "source": "/(.*)", "destination": "/index.html" }]
+  "experimentalServices": {
+    "frontend": {
+      "entrypoint": ".",
+      "routePrefix": "/",
+      "framework": "vite"
+    }
+  },
+  "rewrites": [
+    { "handle": "filesystem" },
+    { "source": "/(.*)", "destination": "/index.html" }
+  ]
 }

@@ -131,52 +131,28 @@ src/
 
 ## Démo en ligne (hackathon)
 
-Déploiement recommandé : **API sur [Render](https://render.com)** + **front sur [Vercel](https://vercel.com)**. Repo public : **[Thedy09/Neuro](https://github.com/Thedy09/Neuro)** (racine = monorepo : `package.json` à la racine, API dans `backend/`).
+Repo : **[Thedy09/Neuro](https://github.com/Thedy09/Neuro)**.
 
-### 1. API (Render)
+### Front sur [Vercel](https://vercel.com) — **API ailleurs** (ex. [Render](https://render.com))
 
-1. [Render Dashboard](https://dashboard.render.com) → **New +** → **Web Service** → connecter GitHub **`Thedy09/Neuro`**, branche **`main`**.
-2. **Docker** — **Root Directory** : **vide** (obligatoire : le build doit voir tout le repo). **Dockerfile Path** : `backend/Dockerfile`. Ne mets pas « Docker Build Context » = `backend` seul (sinon le build ne voit pas `backend/requirements.txt` depuis la racine).
-3. **Runtime** : **Docker**. Render injecte **`PORT`** ; l’image l’utilise déjà.
-4. **Health check path** : `/health`.
-5. **Environment** → ajouter les variables (voir `backend/.env.example`, **sans** commiter ton `.env` local) :
-   - **`ELEVENLABS_API_KEY`**, **`ELEVENLABS_AGENT_ID`**
-   - **`CORS_ORIGINS`** : JSON sur une ligne, ex. au départ `["http://localhost:5173"]` — tu ajouteras l’URL Vercel à l’étape 3.
-   - **`SOLANA_RPC_URL`**, **`LIFI_API_KEY`** (optionnel mais utile), etc.
-6. **Create Web Service**. Quand c’est vert, copier l’URL HTTPS (**sans** slash final). Déploiement actuel du dépôt : **`https://neuro-bii5.onrender.com`** — c’est la valeur de **`VITE_API_URL`** dans `.env.example` / build Vercel.
+Le **`vercel.json`** ne déclare que le service **frontend** (Vite). L’API n’est **pas** buildée sur Vercel.
 
-*Plan gratuit* : “cold start” possible ; ouvre l’URL ~1 min avant une démo live. Fichier optionnel **`render.yaml`** à la racine pour un **Blueprint** Render.
+1. **New Project** → **`Thedy09/Neuro`**, branche **`main`**.
+2. **Preset** : **Services** si proposé, ou framework **Vite**. **Root Directory** : vide. Clique **Refresh** si Vercel demandait un `vercel.json`.
+3. **Environment (Build)** : **`VITE_API_URL`** = URL **HTTPS de ton API** (**sans** `/` final), ex. `https://neuro-bii5.onrender.com`.
+4. **Deploy**. Ouvre ton `.vercel.app`, teste chat / voix (l’API doit avoir les bonnes variables et CORS).
 
-### 2. Front (Vercel)
+**CORS** (sur l’hébergeur API) : inclure l’origine Vercel exacte + le dev local, ex.  
+`["https://ton-site.vercel.app","http://localhost:5173","http://localhost:5174"]`  
+(voir `backend/.env.example`.)
 
-1. [Vercel](https://vercel.com) → **Add New…** → **Project** → importer **`Thedy09/Neuro`**.
-2. **Root Directory** : laisser **vide** (racine du repo, là où est `package.json`).
-3. **Environment Variables** (Build) : **`VITE_API_URL`** = `https://neuro-bii5.onrender.com` (ou ton autre URL Render).
-4. **Deploy**. Noter l’URL du site, ex. `https://neuro-xxx.vercel.app`.
+### API sur Render (rappel)
 
-### 3. CORS final (Render)
+Web Service Docker, root vide, **`backend/Dockerfile`**, health **`/health`**, variables depuis **`backend/.env.example`**.
 
-Dans Render → **Environment** → **`CORS_ORIGINS`** (JSON **sur une ligne**).  
-**Dès que tu as l’URL Vercel**, colle par exemple (remplace le domaine par le tien) :
+---
 
-```text
-["https://neuro-xxx.vercel.app","http://localhost:5173","http://localhost:5174","http://localhost:3000"]
-```
-
-**En attendant le front**, tu peux déjà autoriser le dev local avec :
-
-```text
-["http://localhost:5173","http://localhost:5174","http://localhost:3000"]
-```
-
-Puis **Save** et laisse Redeploy si proposé.
-
-### 4. Vérifier
-
-- `https://neuro-bii5.onrender.com/health` → `{"status":"ok",...}`
-- Site Vercel : chat agent, LI.FI, voix (URL signée via backend) selon tes clés.
-
-**Docker prod tout-en-un (VPS)** : `Dockerfile.web.prod`, `docker-compose.prod.yml` (variable **`NEURO_API_PUBLIC`** au build du front).
+**Docker prod tout-en-un (VPS)** : `Dockerfile.web.prod`, `docker-compose.prod.yml`.
 
 ---
 
