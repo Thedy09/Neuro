@@ -191,14 +191,6 @@ Explorer:   https://explorer.solana.com/address/E7RAJWfEmSAm3NRR4Z2YBqw27fTGazBY
 
 ---
 
-## Screenshots
-
-| Landing | Dashboard | AI Chat | Voice Mode |
-|---------|-----------|---------|------------|
-| ![Landing](./screenshots/landing.png) | ![Dashboard](./screenshots/dashboard.png) | ![Chat](./screenshots/chat.png) | ![Voice](./screenshots/voice.png) |
-
----
-
 ## License
 
 MIT

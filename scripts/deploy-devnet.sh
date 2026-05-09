@@ -34,7 +34,7 @@ fi
 
 # Build program
 echo -e "${CYAN}Building Solana program...${NC}"
-cd program
+cd "$(dirname "$0")/.."/contracts
 anchor build
 
 # Deploy

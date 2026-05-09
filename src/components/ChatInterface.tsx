@@ -22,6 +22,7 @@ import {
   Mic,
   Expand,
 } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import { useWallet } from '@solana/wallet-adapter-react';
 import VoiceSessionPanel from './VoiceSessionPanel';
 import VoiceConfigModal, { getStoredAgentId, storeAgentId } from './VoiceConfigModal';

@@ -16,7 +16,7 @@
         "buildType": "apk"
       },
       "env": {
-        "EXPO_PUBLIC_API_URL": "https://YOUR-BACKEND.example.com",
+        "EXPO_PUBLIC_API_URL": "https://neuro-bii5.onrender.com",
         "EXPO_PUBLIC_SOLANA_RPC": "https://api.devnet.solana.com",
         "EXPO_PUBLIC_PROGRAM_ID": "E7RAJWfEmSAm3NRR4Z2YBqw27fTGazBY2eGzypmFoCnT"
       }
@@ -26,7 +26,7 @@
         "buildType": "app-bundle"
       },
       "env": {
-        "EXPO_PUBLIC_API_URL": "https://YOUR-BACKEND.example.com",
+        "EXPO_PUBLIC_API_URL": "https://neuro-bii5.onrender.com",
         "EXPO_PUBLIC_SOLANA_RPC": "https://api.devnet.solana.com",
         "EXPO_PUBLIC_PROGRAM_ID": "E7RAJWfEmSAm3NRR4Z2YBqw27fTGazBY2eGzypmFoCnT"
       }

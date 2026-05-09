@@ -73,19 +73,16 @@ export class NeuroVaultSDK {
 
   private safeBNToNumber(value: unknown, defaultValue: number = 0): number {
     try {
-      if (value && typeof value.toNumber === "function") return value.toNumber();
-      if (value && typeof value.toString === "function") {
-        const parsed = parseInt(value.toString());
+      const candidate = value as { toNumber?: () => number; toString?: () => string } | null;
+      if (candidate && typeof candidate.toNumber === "function") return candidate.toNumber();
+      if (candidate && typeof candidate.toString === "function") {
+        const parsed = parseInt(candidate.toString(), 10);
         return isNaN(parsed) ? defaultValue : parsed;
       }
       return defaultValue;
     } catch {
       return defaultValue;
     }
-  }
-
-  private solToLamports(sol: number): BN {
-    return this.safeBN(Math.floor(sol * LAMPORTS_PER_SOL));
   }
 
   private lamportsToSol(lamports: BN): number {

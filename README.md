@@ -6,6 +6,20 @@
 
 ---
 
+## Live demo (hackathon submission)
+
+| Resource | URL |
+|---|---|
+| Repository | https://github.com/Thedy09/Neuro |
+| Backend API (FastAPI) | https://neuro-bii5.onrender.com — health: `/health`, docs: `/docs` |
+| Solana program (devnet) | [`E7RAJWfEmSAm3NRR4Z2YBqw27fTGazBY2eGzypmFoCnT`](https://explorer.solana.com/address/E7RAJWfEmSAm3NRR4Z2YBqw27fTGazBY2eGzypmFoCnT?cluster=devnet) |
+| Deploy signature (devnet) | [`29MSiLerLicTio2NTFT9srHo2HDv1YLCM9UGAMMJNNnjKm156TMJbRjXPTQCwACjsD7XTEeL2k28GBm4qKTTVH1E`](https://explorer.solana.com/tx/29MSiLerLicTio2NTFT9srHo2HDv1YLCM9UGAMMJNNnjKm156TMJbRjXPTQCwACjsD7XTEeL2k28GBm4qKTTVH1E?cluster=devnet) |
+| Frontend deploy | Vercel — set `VITE_API_URL=https://neuro-bii5.onrender.com` (see [Démo en ligne](#démo-en-ligne-hackathon)) |
+
+> Free Render plan can cold-start (~30 s on first request). Hit `/health` once before opening the front for the judges.
+
+---
+
 ## Features
 
 ### Voice-First AI Interface

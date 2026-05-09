@@ -37,10 +37,10 @@ const Dashboard: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="h-dvh min-h-0 flex flex-col bg-background">
       <Header />
 
-      <div className="pt-16 flex flex-col h-screen">
+      <div className="flex flex-1 flex-col min-h-0 pt-16">
         {/* Tab bar */}
         <div className="border-b border-border bg-card/30">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">

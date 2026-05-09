@@ -6,7 +6,6 @@ import { Buffer } from 'buffer';
 (window as unknown as { process: { env: Record<string, string> } }).process = { env: {} };
 
 import './index.css';
-import React from 'react';
 import { createRoot } from 'react-dom/client';
 import { BrowserRouter } from 'react-router-dom';
 

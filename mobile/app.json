@@ -4,7 +4,6 @@
     "slug": "neuro-mobile",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/icon.png",
     "scheme": "neuro",
     "userInterfaceStyle": "dark",
     "newArchEnabled": true,
@@ -17,9 +16,6 @@
       "bundleIdentifier": "com.neuro.app"
     },
     "android": {
-      "adaptiveIcon": {
-        "backgroundColor": "#080810"
-      },
       "package": "com.neuro.app"
     },
     "plugins": [
