@@ -10,7 +10,11 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { X, Zap, ExternalLink, AlertCircle } from 'lucide-react';
 
 const STORAGE_KEY = 'neuro_elevenlabs_agent_id';
-const ENV_AGENT_ID = import.meta.env.VITE_ELEVENLABS_AGENT_ID || '';
+// Public agent baked into the bundle so the live demo (judges, fresh browsers,
+// no Vercel env var) gets voice working out of the box. Override via
+// `VITE_ELEVENLABS_AGENT_ID` at build time or via the in-app modal.
+const DEFAULT_AGENT_ID = 'agent_0401kr6t1c6kf9gsdxr71mfhaw0q';
+const ENV_AGENT_ID = import.meta.env.VITE_ELEVENLABS_AGENT_ID || DEFAULT_AGENT_ID;
 
 interface VoiceConfigModalProps {
   open: boolean;
