@@ -3,7 +3,16 @@ NEURO Backend — Agent Router
 AI conversational agent endpoints with WebSocket support
 """
 
-from fastapi import APIRouter, HTTPException, Response, WebSocket, WebSocketDisconnect
+from fastapi import (
+    APIRouter,
+    File,
+    Form,
+    HTTPException,
+    Response,
+    UploadFile,
+    WebSocket,
+    WebSocketDisconnect,
+)
 from pydantic import BaseModel, Field
 import httpx
 import structlog
@@ -187,6 +196,62 @@ async def voice_tts(body: VoiceTtsRequest):
         )
 
     return Response(content=resp.content, media_type="audio/mpeg")
+
+
+@router.post("/voice/stt")
+async def voice_stt(
+    file: UploadFile = File(..., description="Audio file (m4a, wav, mp3, ogg)"),
+    language_code: str | None = Form(default=None),
+):
+    """
+    Server-side ElevenLabs Scribe Speech-To-Text.
+    Returns the transcript so the mobile client never needs the API key.
+    """
+    if not settings.ELEVENLABS_API_KEY:
+        raise HTTPException(
+            status_code=503,
+            detail="ELEVENLABS_API_KEY is not configured on the server",
+        )
+
+    raw = await file.read()
+    if not raw:
+        raise HTTPException(status_code=400, detail="Empty audio payload")
+
+    files = {
+        "file": (file.filename or "audio.m4a", raw, file.content_type or "audio/m4a"),
+    }
+    data: dict[str, str] = {"model_id": "scribe_v1"}
+    if language_code:
+        data["language_code"] = language_code
+
+    try:
+        async with httpx.AsyncClient(timeout=60.0) as client:
+            resp = await client.post(
+                "https://api.elevenlabs.io/v1/speech-to-text",
+                headers={"xi-api-key": settings.ELEVENLABS_API_KEY},
+                files=files,
+                data=data,
+            )
+    except httpx.RequestError as e:
+        raise HTTPException(status_code=502, detail=f"ElevenLabs request failed: {e}") from e
+
+    if resp.status_code >= 400:
+        detail = resp.text[:500]
+        raise HTTPException(
+            status_code=502,
+            detail=f"ElevenLabs STT error {resp.status_code}: {detail}",
+        )
+
+    payload = resp.json()
+    text = (payload.get("text") or "").strip()
+    if not text:
+        raise HTTPException(status_code=502, detail="Empty transcript from ElevenLabs")
+
+    return {
+        "text": text,
+        "language_code": payload.get("language_code"),
+        "language_probability": payload.get("language_probability"),
+    }
 
 
 @router.get("/voice/capabilities")

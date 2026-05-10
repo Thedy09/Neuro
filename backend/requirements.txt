@@ -11,3 +11,4 @@ tenacity==9.0.0
 solders==0.21.0
 anchorpy==0.20.1
 slowapi==0.1.9
+python-multipart==0.0.20

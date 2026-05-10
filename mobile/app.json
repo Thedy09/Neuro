@@ -13,14 +13,24 @@
     },
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.neuro.app"
+      "bundleIdentifier": "com.neuro.app",
+      "infoPlist": {
+        "NSMicrophoneUsageDescription": "NEURO uses the microphone so you can talk to your AI wealth assistant."
+      }
     },
     "android": {
-      "package": "com.neuro.app"
+      "package": "com.neuro.app",
+      "permissions": ["RECORD_AUDIO"]
     },
     "plugins": [
       "expo-router",
-      "expo-font"
+      "expo-font",
+      [
+        "expo-av",
+        {
+          "microphonePermission": "Allow NEURO to access your microphone for voice commands."
+        }
+      ]
     ],
     "experiments": {
       "typedRoutes": true

@@ -62,7 +62,7 @@ export const agentApi = {
   getTools: () => request("/api/v1/agent/tools"),
 };
 
-// Voice (server-side ElevenLabs TTS)
+// Voice (server-side ElevenLabs TTS + STT)
 export const voiceApi = {
   tts: async (text: string): Promise<string> => {
     const response = await fetch(`${API_BASE}/api/v1/agent/voice/tts`, {
@@ -77,6 +77,41 @@ export const voiceApi = {
     const buffer = await response.arrayBuffer();
     const base64 = Buffer.from(buffer).toString("base64");
     return `data:audio/mpeg;base64,${base64}`;
+  },
+
+  stt: async (
+    fileUri: string,
+    languageCode?: string
+  ): Promise<{ text: string; language_code?: string }> => {
+    const form = new FormData();
+    const filename = fileUri.split("/").pop() || "audio.m4a";
+    const mimeType = filename.endsWith(".wav")
+      ? "audio/wav"
+      : filename.endsWith(".mp3")
+      ? "audio/mpeg"
+      : filename.endsWith(".webm")
+      ? "audio/webm"
+      : "audio/m4a";
+
+    form.append("file", {
+      uri: fileUri,
+      name: filename,
+      type: mimeType,
+    } as unknown as Blob);
+
+    if (languageCode) {
+      form.append("language_code", languageCode);
+    }
+
+    const response = await fetch(`${API_BASE}/api/v1/agent/voice/stt`, {
+      method: "POST",
+      body: form,
+    });
+    if (!response.ok) {
+      const err = await response.text().catch(() => "STT error");
+      throw new Error(err.slice(0, 200));
+    }
+    return response.json();
   },
 };
 
