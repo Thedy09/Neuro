@@ -6,7 +6,7 @@
     "orientation": "portrait",
     "scheme": "neuro",
     "userInterfaceStyle": "dark",
-    "newArchEnabled": true,
+    "newArchEnabled": false,
     "splash": {
       "backgroundColor": "#080810",
       "resizeMode": "contain"
