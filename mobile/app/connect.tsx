@@ -1,4 +1,4 @@
-import React, { useCallback } from "react";
+import React, { useCallback, useEffect } from "react";
 import { View, Text, Pressable, Alert } from "react-native";
 import { useRouter } from "expo-router";
 import Animated, { FadeInDown } from "react-native-reanimated";
@@ -27,17 +27,25 @@ const WALLETS = [
 
 export default function ConnectScreen() {
   const router = useRouter();
-  const { connect } = useWalletStore();
+  const { connect, connected } = useWalletStore();
+
+  useEffect(() => {
+    if (connected) {
+      router.replace("/dashboard");
+    }
+  }, [connected, router]);
 
   const handleConnect = useCallback(
     async (walletName: string) => {
       try {
         await connect(walletName);
         router.replace("/dashboard");
-      } catch {
+      } catch (error) {
+        const message =
+          error instanceof Error ? error.message : String(error);
         Alert.alert(
-          "Connection Failed",
-          `Could not connect to ${walletName}. Make sure the app is installed.`
+          "Wallet connection failed",
+          `${walletName}: ${message}\n\nMake sure a Solana wallet (Solflare or Phantom) is installed and configured for Devnet.`
         );
       }
     },

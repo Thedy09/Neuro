@@ -31,6 +31,34 @@ export function getVaultPda(owner: PublicKey): [PublicKey, number] {
   );
 }
 
+function decodeMwaAddress(account: unknown): PublicKey {
+  const candidate = account as {
+    address?: string;
+    publicKey?: unknown;
+  };
+
+  const pk = candidate.publicKey;
+  if (pk instanceof PublicKey) return pk;
+  if (pk && typeof pk === "object" && "length" in (pk as object)) {
+    try {
+      return new PublicKey(pk as Uint8Array);
+    } catch {
+      // fall through
+    }
+  }
+
+  const raw = candidate.address;
+  if (typeof raw === "string") {
+    try {
+      return new PublicKey(Buffer.from(raw, "base64"));
+    } catch {
+      return new PublicKey(raw);
+    }
+  }
+
+  throw new Error("Wallet account has no usable address");
+}
+
 interface WalletState {
   connected: boolean;
   address: string | null;
@@ -70,7 +98,12 @@ export const useWalletStore = create<WalletState>((set, get) => ({
           },
         });
 
-        const pubkey = new PublicKey(authResult.accounts[0].address);
+        const account = authResult.accounts[0];
+        if (!account) {
+          throw new Error("No account returned by wallet");
+        }
+
+        const pubkey = decodeMwaAddress(account);
         const [vaultPda] = getVaultPda(pubkey);
 
         set({
