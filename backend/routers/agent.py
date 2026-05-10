@@ -3,7 +3,7 @@ NEURO Backend — Agent Router
 AI conversational agent endpoints with WebSocket support
 """
 
-from fastapi import APIRouter, HTTPException, WebSocket, WebSocketDisconnect
+from fastapi import APIRouter, HTTPException, Response, WebSocket, WebSocketDisconnect
 from pydantic import BaseModel, Field
 import httpx
 import structlog
@@ -132,6 +132,61 @@ async def voice_signed_url(body: VoiceSignedUrlRequest):
         raise HTTPException(status_code=502, detail=f"ElevenLabs request failed: {e}") from e
 
     return {"signed_url": signed}
+
+
+class VoiceTtsRequest(BaseModel):
+    text: str = Field(..., min_length=1, max_length=2000)
+    voice_id: str | None = Field(default=None, max_length=64)
+    model_id: str | None = Field(default=None, max_length=64)
+
+
+@router.post("/voice/tts")
+async def voice_tts(body: VoiceTtsRequest):
+    """
+    Server-side ElevenLabs Text-To-Speech.
+    Returns an audio/mpeg stream so mobile clients can play it directly
+    without ever seeing the API key.
+    """
+    if not settings.ELEVENLABS_API_KEY:
+        raise HTTPException(
+            status_code=503,
+            detail="ELEVENLABS_API_KEY is not configured on the server",
+        )
+
+    voice_id = (body.voice_id or "JBFqnCBsd6RMkjVDRZzb").strip()
+    model_id = (body.model_id or "eleven_turbo_v2_5").strip()
+
+    try:
+        async with httpx.AsyncClient(timeout=30.0) as client:
+            resp = await client.post(
+                f"https://api.elevenlabs.io/v1/text-to-speech/{voice_id}",
+                headers={
+                    "xi-api-key": settings.ELEVENLABS_API_KEY,
+                    "Content-Type": "application/json",
+                    "Accept": "audio/mpeg",
+                },
+                json={
+                    "text": body.text,
+                    "model_id": model_id,
+                    "voice_settings": {
+                        "stability": 0.45,
+                        "similarity_boost": 0.75,
+                        "style": 0.25,
+                        "use_speaker_boost": True,
+                    },
+                },
+            )
+    except httpx.RequestError as e:
+        raise HTTPException(status_code=502, detail=f"ElevenLabs request failed: {e}") from e
+
+    if resp.status_code >= 400:
+        detail = resp.text[:500]
+        raise HTTPException(
+            status_code=502,
+            detail=f"ElevenLabs TTS error {resp.status_code}: {detail}",
+        )
+
+    return Response(content=resp.content, media_type="audio/mpeg")
 
 
 @router.get("/voice/capabilities")

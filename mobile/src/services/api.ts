@@ -62,6 +62,24 @@ export const agentApi = {
   getTools: () => request("/api/v1/agent/tools"),
 };
 
+// Voice (server-side ElevenLabs TTS)
+export const voiceApi = {
+  tts: async (text: string): Promise<string> => {
+    const response = await fetch(`${API_BASE}/api/v1/agent/voice/tts`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ text }),
+    });
+    if (!response.ok) {
+      const err = await response.text().catch(() => "TTS error");
+      throw new Error(err.slice(0, 200));
+    }
+    const buffer = await response.arrayBuffer();
+    const base64 = Buffer.from(buffer).toString("base64");
+    return `data:audio/mpeg;base64,${base64}`;
+  },
+};
+
 // Vault endpoints
 export const vaultApi = {
   getVault: (ownerPubkey: string) =>
