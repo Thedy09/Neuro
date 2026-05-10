@@ -1,16 +1,8 @@
-import React from "react";
-import { View, Text, ScrollView, Pressable } from "react-native";
+import React, { useEffect, useState } from "react";
+import { View, Text, ScrollView, Pressable, Alert, Linking } from "react-native";
 import Animated, { FadeInDown } from "react-native-reanimated";
 import { Header } from "../src/components/Header";
-
-const VAULT = {
-  owner: "7xKX...m9Qp",
-  riskScore: 34,
-  totalDeposited: "$8,420.00",
-  createdAt: "2025-12-15",
-  bump: 254,
-  status: "Active",
-};
+import { useWalletStore } from "../src/store/walletStore";
 
 const YIELD_OPS = [
   { protocol: "Jito", type: "Liquid Staking", apy: 7.1, risk: "Low", liquidity: 98 },
@@ -19,10 +11,86 @@ const YIELD_OPS = [
   { protocol: "MarginFi", type: "Lending", apy: 6.8, risk: "Low", liquidity: 97 },
 ];
 
+const RISK_SCORE = 34;
+
 const riskColor = (r: string) =>
-  r === "Low" ? "text-neuro-success" : r === "Medium" ? "text-neuro-warning" : "text-neuro-danger";
+  r === "Low"
+    ? "text-neuro-success"
+    : r === "Medium"
+    ? "text-neuro-warning"
+    : "text-neuro-danger";
+
+const trunc = (addr: string | null) =>
+  addr ? `${addr.slice(0, 4)}...${addr.slice(-4)}` : "—";
 
 export default function VaultScreen() {
+  const {
+    connected,
+    address,
+    vaultAddress,
+    solBalance,
+    lastTxSignature,
+    refreshBalance,
+    airdropDevnet,
+    signMemoAndDepositVault,
+  } = useWalletStore();
+
+  const [busy, setBusy] = useState<null | "airdrop" | "deposit">(null);
+
+  useEffect(() => {
+    if (connected) {
+      refreshBalance();
+    }
+  }, [connected, refreshBalance]);
+
+  const onAirdrop = async () => {
+    if (!connected) {
+      Alert.alert("Wallet not connected", "Connect a wallet first.");
+      return;
+    }
+    setBusy("airdrop");
+    try {
+      const sig = await airdropDevnet();
+      Alert.alert("Airdrop confirmed", `1 SOL devnet received.\n\nSig: ${sig.slice(0, 24)}...`);
+    } catch (e) {
+      Alert.alert("Airdrop failed", e instanceof Error ? e.message : String(e));
+    } finally {
+      setBusy(null);
+    }
+  };
+
+  const onSignAndDeposit = async () => {
+    if (!connected) {
+      Alert.alert("Wallet not connected", "Connect a wallet first.");
+      return;
+    }
+    setBusy("deposit");
+    try {
+      const sig = await signMemoAndDepositVault(
+        `NEURO Vault Init — risk:${RISK_SCORE} via Solana Mobile`,
+        10_000_000
+      );
+      Alert.alert(
+        "Transaction sent",
+        `Signature: ${sig.slice(0, 28)}...\n\nTap OK to view on Solana Explorer.`,
+        [
+          { text: "Cancel", style: "cancel" },
+          {
+            text: "OK",
+            onPress: () =>
+              Linking.openURL(
+                `https://explorer.solana.com/tx/${sig}?cluster=devnet`
+              ),
+          },
+        ]
+      );
+    } catch (e) {
+      Alert.alert("Transaction failed", e instanceof Error ? e.message : String(e));
+    } finally {
+      setBusy(null);
+    }
+  };
+
   return (
     <View className="flex-1 bg-neuro-bg">
       <Header title="Vault" showBack />
@@ -32,26 +100,39 @@ export default function VaultScreen() {
         contentContainerStyle={{ paddingBottom: 40 }}
         showsVerticalScrollIndicator={false}
       >
-        {/* Vault overview */}
         <Animated.View
           entering={FadeInDown.delay(100).duration(500)}
           className="bg-neuro-surface border border-neuro-border rounded-xl p-4 mt-4"
         >
           <View className="flex-row items-center justify-between mb-4">
             <Text className="text-white text-sm font-semibold">PDA Vault</Text>
-            <View className="bg-neuro-success/10 border border-neuro-success/20 rounded-full px-2 py-0.5">
-              <Text className="text-neuro-success text-[10px] font-medium">
-                {VAULT.status}
+            <View
+              className={`rounded-full px-2 py-0.5 border ${
+                connected
+                  ? "bg-neuro-success/10 border-neuro-success/20"
+                  : "bg-neuro-warning/10 border-neuro-warning/20"
+              }`}
+            >
+              <Text
+                className={`text-[10px] font-medium ${
+                  connected ? "text-neuro-success" : "text-neuro-warning"
+                }`}
+              >
+                {connected ? "Connected" : "Not connected"}
               </Text>
             </View>
           </View>
 
           <View className="flex-row flex-wrap gap-y-3">
             {[
-              { label: "Owner", value: VAULT.owner },
-              { label: "Total Deposited", value: VAULT.totalDeposited },
-              { label: "Created", value: VAULT.createdAt },
-              { label: "PDA Bump", value: String(VAULT.bump) },
+              { label: "Owner", value: trunc(address) },
+              {
+                label: "SOL Balance",
+                value:
+                  solBalance != null ? `${solBalance.toFixed(4)} SOL` : "—",
+              },
+              { label: "Vault PDA", value: trunc(vaultAddress) },
+              { label: "Cluster", value: "devnet" },
             ].map((item) => (
               <View key={item.label} className="w-1/2">
                 <Text className="text-neuro-muted text-[10px] uppercase tracking-wider mb-0.5">
@@ -65,7 +146,65 @@ export default function VaultScreen() {
           </View>
         </Animated.View>
 
-        {/* Risk score */}
+        <Animated.View
+          entering={FadeInDown.delay(150).duration(500)}
+          className="mt-4 gap-3"
+        >
+          <Pressable
+            onPress={onAirdrop}
+            disabled={!connected || busy !== null}
+            className={`rounded-xl py-3 items-center border ${
+              connected && !busy
+                ? "border-neuro-border bg-neuro-surface active:bg-neuro-card"
+                : "border-neuro-border bg-neuro-surface opacity-40"
+            }`}
+          >
+            <Text className="text-white text-sm font-semibold">
+              {busy === "airdrop" ? "Requesting airdrop..." : "Airdrop 1 SOL (devnet)"}
+            </Text>
+          </Pressable>
+
+          <Pressable
+            onPress={onSignAndDeposit}
+            disabled={!connected || busy !== null}
+            className={`rounded-xl py-4 items-center ${
+              connected && !busy
+                ? "bg-neuro-cyan active:opacity-80"
+                : "bg-neuro-cyan opacity-40"
+            }`}
+          >
+            <Text className="text-neuro-bg text-base font-semibold">
+              {busy === "deposit"
+                ? "Signing on device..."
+                : "Sign + Deposit 0.01 SOL via MWA"}
+            </Text>
+          </Pressable>
+
+          {lastTxSignature && (
+            <Pressable
+              onPress={() =>
+                Linking.openURL(
+                  `https://explorer.solana.com/tx/${lastTxSignature}?cluster=devnet`
+                )
+              }
+              className="bg-neuro-card border border-neuro-border rounded-xl p-3"
+            >
+              <Text className="text-neuro-muted text-[10px] uppercase tracking-wider mb-1">
+                Last on-chain signature
+              </Text>
+              <Text
+                className="text-neuro-cyan text-xs font-mono"
+                numberOfLines={1}
+              >
+                {lastTxSignature}
+              </Text>
+              <Text className="text-neuro-muted text-[10px] mt-1">
+                Tap to open Solana Explorer
+              </Text>
+            </Pressable>
+          )}
+        </Animated.View>
+
         <Animated.View
           entering={FadeInDown.delay(200).duration(500)}
           className="bg-neuro-surface border border-neuro-border rounded-xl p-4 mt-4"
@@ -82,7 +221,7 @@ export default function VaultScreen() {
           <View className="flex-row items-center gap-4">
             <View className="w-16 h-16 rounded-full border-[3px] border-neuro-cyan items-center justify-center">
               <Text className="text-white text-xl font-bold">
-                {VAULT.riskScore}
+                {RISK_SCORE}
               </Text>
             </View>
             <View className="flex-1">
@@ -90,17 +229,16 @@ export default function VaultScreen() {
                 Conservative Profile
               </Text>
               <Text className="text-neuro-muted text-xs leading-5">
-                Score {VAULT.riskScore}/100 — preference for stable,
+                Score {RISK_SCORE}/100 — preference for stable,
                 low-volatility strategies.
               </Text>
             </View>
           </View>
 
-          {/* Progress bar */}
           <View className="h-2 bg-neuro-card rounded-full mt-4 overflow-hidden">
             <View
               className="h-full bg-neuro-success rounded-full"
-              style={{ width: `${VAULT.riskScore}%` }}
+              style={{ width: `${RISK_SCORE}%` }}
             />
           </View>
           <View className="flex-row justify-between mt-1">
@@ -116,7 +254,6 @@ export default function VaultScreen() {
           </View>
         </Animated.View>
 
-        {/* Yield opportunities */}
         <Animated.View
           entering={FadeInDown.delay(300).duration(500)}
           className="mt-4"

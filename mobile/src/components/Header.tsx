@@ -11,11 +11,13 @@ interface HeaderProps {
 
 export function Header({ title, showBack, showWallet }: HeaderProps) {
   const router = useRouter();
-  const { connected, address } = useWalletStore();
+  const { connected, address, solBalance } = useWalletStore();
 
   const truncated = address
     ? `${address.slice(0, 4)}...${address.slice(-4)}`
     : "";
+  const balanceLabel =
+    solBalance != null ? `${solBalance.toFixed(2)} SOL` : null;
 
   return (
     <View className="bg-neuro-surface border-b border-neuro-border px-4 pt-14 pb-3 flex-row items-center justify-between">
@@ -37,10 +39,15 @@ export function Header({ title, showBack, showWallet }: HeaderProps) {
       <Text className="text-white text-base font-semibold">{title}</Text>
 
       {showWallet && connected ? (
-        <View className="bg-neuro-card border border-neuro-border rounded-lg px-2.5 py-1.5">
+        <View className="bg-neuro-card border border-neuro-border rounded-lg px-2.5 py-1.5 items-end">
           <Text className="text-neuro-cyan text-[10px] font-mono">
             {truncated}
           </Text>
+          {balanceLabel && (
+            <Text className="text-neuro-muted text-[9px] font-mono mt-0.5">
+              {balanceLabel}
+            </Text>
+          )}
         </View>
       ) : (
         <View className="w-16" />

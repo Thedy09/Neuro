@@ -8,6 +8,12 @@
       "distribution": "internal",
       "android": {
         "buildType": "apk"
+      },
+      "env": {
+        "EXPO_PUBLIC_API_URL": "https://neuro-bii5.onrender.com",
+        "EXPO_PUBLIC_SOLANA_RPC": "https://api.devnet.solana.com",
+        "EXPO_PUBLIC_PROGRAM_ID": "E7RAJWfEmSAm3NRR4Z2YBqw27fTGazBY2eGzypmFoCnT",
+        "EXPO_PUBLIC_ELEVENLABS_AGENT_ID": "agent_0401kr6t1c6kf9gsdxr71mfhaw0q"
       }
     },
     "preview": {
@@ -18,7 +24,8 @@
       "env": {
         "EXPO_PUBLIC_API_URL": "https://neuro-bii5.onrender.com",
         "EXPO_PUBLIC_SOLANA_RPC": "https://api.devnet.solana.com",
-        "EXPO_PUBLIC_PROGRAM_ID": "E7RAJWfEmSAm3NRR4Z2YBqw27fTGazBY2eGzypmFoCnT"
+        "EXPO_PUBLIC_PROGRAM_ID": "E7RAJWfEmSAm3NRR4Z2YBqw27fTGazBY2eGzypmFoCnT",
+        "EXPO_PUBLIC_ELEVENLABS_AGENT_ID": "agent_0401kr6t1c6kf9gsdxr71mfhaw0q"
       }
     },
     "production": {
@@ -28,7 +35,8 @@
       "env": {
         "EXPO_PUBLIC_API_URL": "https://neuro-bii5.onrender.com",
         "EXPO_PUBLIC_SOLANA_RPC": "https://api.devnet.solana.com",
-        "EXPO_PUBLIC_PROGRAM_ID": "E7RAJWfEmSAm3NRR4Z2YBqw27fTGazBY2eGzypmFoCnT"
+        "EXPO_PUBLIC_PROGRAM_ID": "E7RAJWfEmSAm3NRR4Z2YBqw27fTGazBY2eGzypmFoCnT",
+        "EXPO_PUBLIC_ELEVENLABS_AGENT_ID": "agent_0401kr6t1c6kf9gsdxr71mfhaw0q"
       }
     }
   },

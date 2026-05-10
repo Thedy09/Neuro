@@ -135,20 +135,22 @@ export const useChatStore = create<ChatState>((set) => ({
 
     try {
       const wallet = useWalletStore.getState().address ?? undefined;
-      const result = await agentApi.chat({
+      const result = (await agentApi.chat({
         message: text,
         session_id: mobileChatSessionId,
         wallet_address: wallet,
-      });
+      })) as {
+        session_id: string;
+        response: string;
+        action?: { type: string; data: Record<string, unknown> } | null;
+      };
       mobileChatSessionId = result.session_id;
       const aiMsg: Message = {
         id: `${Date.now()}-api`,
         role: "assistant",
         content: result.response,
         timestamp: new Date(),
-        action: mapAgentActionToChatAction(
-          result.action as { type: string; data: Record<string, unknown> } | null
-        ),
+        action: mapAgentActionToChatAction(result.action ?? null),
       };
       set((state) => ({
         messages: [...state.messages, aiMsg],

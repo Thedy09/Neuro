@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { View, Text, Pressable, ScrollView } from "react-native";
 import { useRouter } from "expo-router";
 import Animated, { FadeInDown } from "react-native-reanimated";
@@ -6,9 +6,17 @@ import { PortfolioStats } from "../src/components/PortfolioStats";
 import { ActivePositions } from "../src/components/ActivePositions";
 import { ChainAllocation } from "../src/components/ChainAllocation";
 import { Header } from "../src/components/Header";
+import { useWalletStore } from "../src/store/walletStore";
 
 export default function DashboardScreen() {
   const router = useRouter();
+  const { connected, refreshBalance } = useWalletStore();
+
+  useEffect(() => {
+    if (connected) {
+      refreshBalance();
+    }
+  }, [connected, refreshBalance]);
 
   return (
     <View className="flex-1 bg-neuro-bg">

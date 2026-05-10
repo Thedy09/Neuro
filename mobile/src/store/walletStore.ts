@@ -3,19 +3,50 @@ import {
   transact,
   Web3MobileWallet,
 } from "@solana-mobile/mobile-wallet-adapter-protocol-web3js";
-import { PublicKey, Transaction } from "@solana/web3.js";
+import {
+  Connection,
+  LAMPORTS_PER_SOL,
+  PublicKey,
+  SystemProgram,
+  Transaction,
+  TransactionInstruction,
+} from "@solana/web3.js";
 import bs58 from "bs58";
+
+const RPC_URL =
+  process.env.EXPO_PUBLIC_SOLANA_RPC || "https://api.devnet.solana.com";
+const PROGRAM_ID_STR =
+  process.env.EXPO_PUBLIC_PROGRAM_ID ||
+  "E7RAJWfEmSAm3NRR4Z2YBqw27fTGazBY2eGzypmFoCnT";
+const MEMO_PROGRAM_ID = new PublicKey(
+  "MemoSq4gqABAXKb96qnH8TysNcWxMyWCqXgDLGmfcHr"
+);
+
+const connection = new Connection(RPC_URL, "confirmed");
+
+export function getVaultPda(owner: PublicKey): [PublicKey, number] {
+  return PublicKey.findProgramAddressSync(
+    [owner.toBuffer(), Buffer.from("vault")],
+    new PublicKey(PROGRAM_ID_STR)
+  );
+}
 
 interface WalletState {
   connected: boolean;
   address: string | null;
   publicKey: PublicKey | null;
   authToken: string | null;
+  solBalance: number | null;
+  vaultAddress: string | null;
+  lastTxSignature: string | null;
 
   connect: (walletName?: string) => Promise<void>;
   disconnect: () => void;
+  refreshBalance: () => Promise<void>;
   signTransaction: (tx: Transaction) => Promise<Transaction>;
   signAndSendTransaction: (tx: Transaction) => Promise<string>;
+  airdropDevnet: () => Promise<string>;
+  signMemoAndDepositVault: (memo: string, lamports: number) => Promise<string>;
 }
 
 export const useWalletStore = create<WalletState>((set, get) => ({
@@ -23,6 +54,9 @@ export const useWalletStore = create<WalletState>((set, get) => ({
   address: null,
   publicKey: null,
   authToken: null,
+  solBalance: null,
+  vaultAddress: null,
+  lastTxSignature: null,
 
   connect: async () => {
     try {
@@ -37,14 +71,18 @@ export const useWalletStore = create<WalletState>((set, get) => ({
         });
 
         const pubkey = new PublicKey(authResult.accounts[0].address);
+        const [vaultPda] = getVaultPda(pubkey);
 
         set({
           connected: true,
           address: pubkey.toBase58(),
           publicKey: pubkey,
           authToken: authResult.auth_token,
+          vaultAddress: vaultPda.toBase58(),
         });
       });
+
+      await get().refreshBalance();
     } catch (error) {
       console.error("Wallet connection failed:", error);
       throw error;
@@ -57,7 +95,21 @@ export const useWalletStore = create<WalletState>((set, get) => ({
       address: null,
       publicKey: null,
       authToken: null,
+      solBalance: null,
+      vaultAddress: null,
+      lastTxSignature: null,
     });
+  },
+
+  refreshBalance: async () => {
+    const { publicKey } = get();
+    if (!publicKey) return;
+    try {
+      const lamports = await connection.getBalance(publicKey);
+      set({ solBalance: lamports / LAMPORTS_PER_SOL });
+    } catch (error) {
+      console.warn("getBalance failed:", error);
+    }
   },
 
   signTransaction: async (tx: Transaction) => {
@@ -67,7 +119,10 @@ export const useWalletStore = create<WalletState>((set, get) => ({
     let signedTx: Transaction = tx;
 
     await transact(async (wallet: Web3MobileWallet) => {
-      await wallet.reauthorize({ auth_token: authToken });
+      await wallet.reauthorize({
+        auth_token: authToken,
+        identity: { name: "NEURO", uri: "https://neuro.app", icon: "favicon.ico" },
+      });
       const result = await wallet.signTransactions({
         transactions: [tx],
       });
@@ -84,13 +139,64 @@ export const useWalletStore = create<WalletState>((set, get) => ({
     let signature = "";
 
     await transact(async (wallet: Web3MobileWallet) => {
-      await wallet.reauthorize({ auth_token: authToken });
+      await wallet.reauthorize({
+        auth_token: authToken,
+        identity: { name: "NEURO", uri: "https://neuro.app", icon: "favicon.ico" },
+      });
       const result = await wallet.signAndSendTransactions({
         transactions: [tx],
       });
-      signature = bs58.encode(result[0]);
+      const raw = result[0] as unknown;
+      signature =
+        typeof raw === "string"
+          ? raw
+          : bs58.encode(raw as Uint8Array);
     });
 
+    set({ lastTxSignature: signature });
+    return signature;
+  },
+
+  airdropDevnet: async () => {
+    const { publicKey } = get();
+    if (!publicKey) throw new Error("Not connected");
+    const sig = await connection.requestAirdrop(publicKey, LAMPORTS_PER_SOL);
+    await connection.confirmTransaction(sig, "confirmed");
+    set({ lastTxSignature: sig });
+    await get().refreshBalance();
+    return sig;
+  },
+
+  signMemoAndDepositVault: async (memo: string, lamports: number) => {
+    const { publicKey } = get();
+    if (!publicKey) throw new Error("Not connected");
+
+    const [vaultPda] = getVaultPda(publicKey);
+
+    const tx = new Transaction();
+    tx.add(
+      new TransactionInstruction({
+        keys: [
+          { pubkey: publicKey, isSigner: true, isWritable: false },
+        ],
+        programId: MEMO_PROGRAM_ID,
+        data: Buffer.from(memo, "utf8"),
+      }),
+      SystemProgram.transfer({
+        fromPubkey: publicKey,
+        toPubkey: vaultPda,
+        lamports,
+      })
+    );
+
+    const { blockhash, lastValidBlockHeight } =
+      await connection.getLatestBlockhash("confirmed");
+    tx.recentBlockhash = blockhash;
+    tx.lastValidBlockHeight = lastValidBlockHeight;
+    tx.feePayer = publicKey;
+
+    const signature = await get().signAndSendTransaction(tx);
+    await get().refreshBalance();
     return signature;
   },
 }));
