@@ -24,6 +24,15 @@
     ],
     "experiments": {
       "typedRoutes": true
-    }
+    },
+    "extra": {
+      "router": {
+        "origin": false
+      },
+      "eas": {
+        "projectId": "6011e964-4cad-49b0-a634-1bd1b37eda3b"
+      }
+    },
+    "owner": "thedy09"
   }
 }
