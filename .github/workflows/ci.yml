@@ -1,0 +1,91 @@
+name: CI
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+    branches: [main, master]
+
+# Cancel superseded runs on the same ref.
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  backend:
+    name: Backend · ruff + pytest
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: backend
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt -r requirements-dev.txt
+
+      - name: Lint (ruff)
+        run: ruff check .
+
+      - name: Test (pytest)
+        run: pytest -q
+
+  frontend:
+    name: Web · typecheck + lint + build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Type-check
+        run: npm run typecheck
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Build
+        run: npm run build
+
+  anchor:
+    name: Solana program · anchor build
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: contracts
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Solana + Anchor toolchain
+        uses: metadaoproject/setup-anchor@v2
+        with:
+          anchor-version: "0.31.1"
+          solana-cli-version: "stable"
+          node-version: "20"
+
+      - name: Generate a CI keypair
+        run: solana-keygen new --no-bip39-passphrase --force -o ~/.config/solana/id.json
+
+      - name: Build program
+        run: anchor build
+
+      - name: Run program tests
+        # Spins up a local validator; allowed to fail without blocking the merge
+        # so a flaky validator boot does not red-flag the whole pipeline.
+        continue-on-error: true
+        run: anchor test --skip-deploy

@@ -1,0 +1,59 @@
+# NEURO — Solana dApp Store publishing config
+# Consumed by @solana-mobile/dapp-store-cli (`npx dapp-store ...`).
+# Docs: ../../docs/SOLANA_DAPP_STORE.md  •  https://docs.solanamobile.com/dapp-publishing/intro
+#
+# The `address` fields are filled in automatically by the CLI the first time you
+# run `create publisher` / `create app` / `create release` (each mints an NFT on
+# the publishing chain). Commit the generated addresses so future releases reuse
+# the same on-chain identity.
+
+publisher:
+  name: NEURO Labs
+  website: https://neuro-x.vercel.app
+  email: thedyivan85@gmail.com
+  # address: <minted by `npx dapp-store create publisher`>
+
+app:
+  name: NEURO
+  android_package: com.neuro.app
+  # address: <minted by `npx dapp-store create app`>
+  urls:
+    license_url: https://neuro-x.vercel.app/license
+    copyright_url: https://neuro-x.vercel.app
+    privacy_policy_url: https://neuro-x.vercel.app/privacy
+    website: https://neuro-x.vercel.app
+
+release:
+  # address: <minted by `npx dapp-store create release`>
+  media:
+    - purpose: icon
+      uri: ./media/icon.png
+  files: []
+  catalog:
+    en-US:
+      name: NEURO
+      short_description: Voice-first AI wealth OS on Solana.
+      long_description: >
+        NEURO is a voice-first AI DeFi operating system on Solana. Talk to your
+        AI private banker to bridge cross-chain assets via LI.FI, deposit into
+        personal on-chain vaults, and get risk-aware yield recommendations across
+        Jito, Kamino, Drift, and MarginFi. Built for Solana Mobile with the
+        Mobile Wallet Adapter for on-device key custody — your keys never leave
+        your phone.
+      new_in_version: Initial Solana dApp Store release.
+      saga_features: >
+        Native Mobile Wallet Adapter signing and hold-to-talk voice control,
+        tuned for the Seeker / Saga hardware.
+      images:
+        # Add 4-8 device screenshots (1080x1920 or 1920x1080) under ./media/.
+        - ./media/screenshot-1.png
+        - ./media/screenshot-2.png
+        - ./media/screenshot-3.png
+
+solana_mobile_dapp_publisher_portal:
+  google_store_package: com.neuro.app
+  testing_instructions: >
+    Launch the app, tap "Connect Wallet" and approve via any MWA-compatible
+    wallet (e.g. Phantom/Solflare) on devnet. Hold the mic button and say
+    "What's the best yield for low risk?" to exercise the voice → STT → agent →
+    TTS loop, then try "Bridge 100 USDC from Base to Solana" for the LI.FI flow.

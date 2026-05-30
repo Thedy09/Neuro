@@ -8,7 +8,6 @@ import structlog
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel, Field
 from solders.pubkey import Pubkey
-from solders.rpc.responses import GetAccountInfoResp
 import httpx
 
 from config import settings

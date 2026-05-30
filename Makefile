@@ -24,6 +24,9 @@ mobile: ## Start mobile app
 mobile-build-preview: ## EAS Android APK (preview) — requires: cd mobile && npx eas-cli login && npx eas-cli init
 	cd mobile && npx eas-cli build --platform android --profile preview
 
+dapp-store-init: ## Scaffold Solana dApp Store assets (see docs/SOLANA_DAPP_STORE.md)
+	cd mobile/dapp-store && npx --yes @solana-mobile/dapp-store-cli@latest init
+
 elevenlabs-agent: ## Create ElevenLabs NEURO agent (requires ELEVENLABS_API_KEY in backend/.env)
 	python backend/scripts/create_elevenlabs_agent.py
 

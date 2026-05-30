@@ -64,15 +64,32 @@ Real-time portfolio overview pulling live data from the Solana blockchain:
 - **Active Positions** — DeFi protocol allocations across Kamino, Drift, MarginFi, Jito
 - **Chain Allocation** — Cross-chain exposure breakdown with animated progress bars
 
-### Text Chat with Intent Detection
+### Text Chat — Hybrid LLM + Deterministic Tools
 
-Standard text chat with simulated intent detection for three DeFi verticals:
+The chat agent ([`backend/services/agent_service.py`](backend/services/agent_service.py))
+is **LLM-first with a deterministic fallback**. When an LLM key is configured
+(`ANTHROPIC_API_KEY`, or any OpenAI-compatible endpoint via `LLM_API_KEY`), the
+model classifies intent, extracts parameters, and writes the natural-language
+reply — while DeFi actions still run through verified tools. With no key set, it
+falls back to the keyword router + templates, so there is **zero hard dependency**
+on an external LLM. See [`backend/services/llm_service.py`](backend/services/llm_service.py).
 
 | Intent | Trigger Words | Response |
 |---|---|---|
-| Bridge | "bridge", "move", "transfer", "send" | Optimal route via LI.FI with gas estimate |
-| Yield | "yield", "apy", "optimize", "earn" | Risk-adjusted protocol recommendations |
+| Bridge | "bridge", "move", "transfer", "send" | Optimal route via LI.FI + ready-to-sign tx |
+| Yield | "yield", "apy", "optimize", "earn" | Live, risk-adjusted protocol recommendations |
 | Risk | "risk", "portfolio", "analyze", "score" | Full portfolio risk breakdown |
+
+**Live DeFi data.** Yield recommendations pull live APY/TVL for Jito, Kamino,
+Drift, and MarginFi from each protocol's public API
+([`backend/services/defi_data_service.py`](backend/services/defi_data_service.py)),
+cached with a short TTL and a per-protocol static fallback so the agent is never
+blocked by an upstream outage. Each protocol is tagged `live` or `fallback`.
+
+**Executable bridges.** Because custody is on-device, the backend never signs.
+`POST /api/v1/bridge/execute` returns an unsigned LI.FI `transaction_request`
+that the wallet (MWA on mobile, wallet-standard on web) signs and broadcasts;
+`GET /api/v1/bridge/status/{tx_hash}` tracks it to completion.
 
 Each response includes an actionable card with structured data and (for bridges) a transaction execution button.
 
@@ -304,6 +321,30 @@ npm run build     # Production build
 npm run preview   # Preview production build
 npm run lint      # Run ESLint
 ```
+
+### Backend tests & lint
+
+```bash
+pip install -r backend/requirements-dev.txt
+make test         # pytest (backend/tests) — services + routers, fully mocked, no network
+make lint         # eslint (web) + ruff (backend)
+```
+
+---
+
+## CI/CD
+
+[`.github/workflows/ci.yml`](.github/workflows/ci.yml) runs on every push/PR:
+
+- **Backend** — `ruff check` + `pytest` (49 tests, no live network).
+- **Web** — `tsc` type-check + ESLint + production build.
+- **Solana program** — `anchor build` (and a best-effort `anchor test`).
+
+## Solana dApp Store
+
+Publishing config and a step-by-step guide are included:
+[`mobile/dapp-store/config.yaml`](mobile/dapp-store/config.yaml) ·
+[`docs/SOLANA_DAPP_STORE.md`](docs/SOLANA_DAPP_STORE.md) (`make dapp-store-init`).
 
 ---
 
