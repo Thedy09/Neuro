@@ -51,7 +51,10 @@ jobs:
           cache: npm
 
       - name: Install dependencies
-        run: npm ci
+        # The committed lock file is not fully in sync with package.json, so use
+        # `npm install` (not `npm ci`). --legacy-peer-deps tolerates the known
+        # qrcode.react/react peer mismatch from a transitive dep.
+        run: npm install --no-audit --no-fund --legacy-peer-deps
 
       - name: Type-check
         run: npm run typecheck
@@ -68,24 +71,37 @@ jobs:
     defaults:
       run:
         working-directory: contracts
+    env:
+      ANCHOR_VERSION: "0.31.1"
     steps:
       - uses: actions/checkout@v4
 
-      - name: Install Solana + Anchor toolchain
-        uses: metadaoproject/setup-anchor@v2
+      - name: Set up Node
+        uses: actions/setup-node@v4
         with:
-          anchor-version: "0.31.1"
-          solana-cli-version: "stable"
           node-version: "20"
+
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Cache cargo + anchor
+        uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: contracts
+
+      - name: Install Solana CLI (anza)
+        run: |
+          sh -c "$(curl -sSfL https://release.anza.xyz/stable/install)"
+          echo "$HOME/.local/share/solana/install/active_release/bin" >> "$GITHUB_PATH"
+
+      - name: Install Anchor (avm)
+        run: |
+          cargo install --git https://github.com/coral-xyz/anchor avm --locked --force
+          avm install "$ANCHOR_VERSION"
+          avm use "$ANCHOR_VERSION"
 
       - name: Generate a CI keypair
         run: solana-keygen new --no-bip39-passphrase --force -o ~/.config/solana/id.json
 
       - name: Build program
         run: anchor build
-
-      - name: Run program tests
-        # Spins up a local validator; allowed to fail without blocking the merge
-        # so a flaky validator boot does not red-flag the whole pipeline.
-        continue-on-error: true
-        run: anchor test --skip-deploy

@@ -338,7 +338,7 @@ make lint         # eslint (web) + ruff (backend)
 
 - **Backend** — `ruff check` + `pytest` (49 tests, no live network).
 - **Web** — `tsc` type-check + ESLint + production build.
-- **Solana program** — `anchor build` (and a best-effort `anchor test`).
+- **Solana program** — `anchor build` (Anchor 0.31.1 via avm).
 
 ## Solana dApp Store
 
