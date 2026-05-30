@@ -2,7 +2,3 @@
 pytest>=8.3.0
 pytest-asyncio>=0.24.0
 ruff>=0.8.0
-# anchorpy (in requirements.txt) registers a pytest11 plugin that imports
-# pytest_xprocess; without it, pytest fails to start. We don't use anchorpy's
-# fixtures, but the plugin must be importable.
-pytest-xprocess>=1.0.0
