@@ -1,7 +1,10 @@
 """
 NEURO Backend — AI Agent Service
-Rule-based intents / templated replies plus LI.FI-backed bridging tools (no hosted LLM in this module).
-Browser-side ElevenLabs voice uses `ElevenLabsService` separately from `/chat`.
+Hybrid agent: deterministic DeFi tool execution (live yield data + LI.FI bridging)
+with an optional LLM layer (see `llm_service`) for intent classification and
+natural-language replies. Falls back to keyword routing + templates when no LLM
+key is configured. Browser-side ElevenLabs voice uses `ElevenLabsService`
+separately from `/chat`.
 """
 
 import re
@@ -9,70 +12,28 @@ import uuid
 import structlog
 from typing import Any
 
+from services.defi_data_service import defi_data_service
 from services.lifi_service import lifi_service
+from services.llm_service import llm_service
 from config import settings
 
 logger = structlog.get_logger()
 
 
-# ─── Yield Protocol Data ───────────────���─────────────────────────────────────
-
-YIELD_PROTOCOLS = [
-    {
-        "protocol": "Jito",
-        "type": "Liquid Staking",
-        "asset": "SOL",
-        "apy": 7.1,
-        "risk_level": "Low",
-        "risk_score": 15,
-        "liquidity_score": 98,
-        "tvl": "$2.1B",
-        "recommendation": "Conservative pick. Reliable yield with high liquidity.",
-    },
-    {
-        "protocol": "Kamino",
-        "type": "USDC Vault",
-        "asset": "USDC",
-        "apy": 8.2,
-        "risk_level": "Low",
-        "risk_score": 20,
-        "liquidity_score": 95,
-        "tvl": "$890M",
-        "recommendation": "Best risk-adjusted return for stablecoin exposure.",
-    },
-    {
-        "protocol": "Drift",
-        "type": "USDC-SOL LP",
-        "asset": "USDC-SOL",
-        "apy": 12.4,
-        "risk_level": "Medium",
-        "risk_score": 45,
-        "liquidity_score": 82,
-        "tvl": "$320M",
-        "recommendation": "Higher yield suitable for medium risk tolerance.",
-    },
-    {
-        "protocol": "MarginFi",
-        "type": "Lending",
-        "asset": "USDC",
-        "apy": 6.8,
-        "risk_level": "Low",
-        "risk_score": 12,
-        "liquidity_score": 97,
-        "tvl": "$650M",
-        "recommendation": "Most conservative. Lending with highest liquidity.",
-    },
-]
-
-
 # ─── Agent Tools ──────────────────────────────────────────────────────────────
 
 async def get_yield_analysis(risk_tolerance: int = 50) -> dict:
-    """Analyze yield opportunities across Solana DeFi protocols."""
+    """Analyze yield opportunities across Solana DeFi protocols.
+
+    Pulls live APY / TVL from each protocol's public API (with a cached static
+    fallback per protocol), then filters and ranks by risk-adjusted APY.
+    """
     logger.info("tool_get_yield_analysis", risk_tolerance=risk_tolerance)
 
+    protocols = await defi_data_service.get_protocols()
+
     filtered = []
-    for p in YIELD_PROTOCOLS:
+    for p in protocols:
         if risk_tolerance < 30 and p["risk_level"] != "Low":
             continue
         if risk_tolerance < 60 and p["risk_level"] == "High":
@@ -82,7 +43,8 @@ async def get_yield_analysis(risk_tolerance: int = 50) -> dict:
     # Sort by risk-adjusted APY
     filtered.sort(key=lambda x: x["apy"] / max(x["risk_score"], 1), reverse=True)
 
-    recommended = filtered[0] if filtered else YIELD_PROTOCOLS[0]
+    recommended = filtered[0] if filtered else protocols[0]
+    data_freshness = "live" if any(p.get("source") == "live" for p in protocols) else "fallback"
 
     return {
         "protocols": filtered,
@@ -94,6 +56,7 @@ async def get_yield_analysis(risk_tolerance: int = 50) -> dict:
             "reason": recommended["recommendation"],
         },
         "risk_tolerance_used": risk_tolerance,
+        "data_freshness": data_freshness,
     }
 
 
@@ -161,7 +124,7 @@ async def get_portfolio_risk(wallet_address: str | None = None) -> dict:
                 )
                 result = resp.json().get("result", {}).get("value")
                 if result:
-                    import base64, struct
+                    import base64
                     data = base64.b64decode(result["data"][0])
                     # Skip 8-byte discriminator + 32-byte owner → risk_tolerance_score is at offset 40
                     if len(data) >= 41:
@@ -356,6 +319,43 @@ class NeuroAgent:
     def __init__(self):
         self._sessions: dict[str, list[dict]] = {}
 
+    async def _resolve_intent(self, message: str) -> tuple[str, dict[str, Any]]:
+        """LLM-first intent resolution with a deterministic keyword fallback.
+
+        When an LLM is configured it classifies the intent and extracts params;
+        anything missing (or a disabled/failed LLM) falls back to the regex
+        router so DeFi actions stay reliable.
+        """
+        keyword_intent, keyword_params = detect_intent(message)
+
+        llm_result = await llm_service.classify_intent(message)
+        if not llm_result:
+            return keyword_intent, keyword_params
+
+        intent = llm_result.get("intent", keyword_intent)
+
+        # For bridges, normalise the LLM's human-readable params into the same
+        # shape the keyword router produces (smallest-unit amount, etc.).
+        if intent == "cross_chain_move":
+            token = str(llm_result.get("token") or keyword_params.get("token") or "USDC").upper()
+            source = str(
+                llm_result.get("source_chain") or keyword_params.get("source_chain") or "BASE"
+            ).upper()
+            amount_human = llm_result.get("amount_human")
+            if isinstance(amount_human, (int, float)) and amount_human > 0:
+                amount = _human_to_smallest_unit(float(amount_human), token)
+            else:
+                amount = keyword_params.get("amount_smallest_unit") or _human_to_smallest_unit(
+                    300.0, token
+                )
+            return intent, {
+                "source_chain": source,
+                "token": token,
+                "amount_smallest_unit": amount,
+            }
+
+        return intent, keyword_params if intent == keyword_intent else {}
+
     async def process_message(
         self,
         message: str,
@@ -370,17 +370,21 @@ class NeuroAgent:
 
         self._sessions[sid].append({"role": "user", "content": message})
 
-        # Detect intent
-        intent, params = detect_intent(message)
-        logger.info("agent_intent_detected", intent=intent, session=sid)
+        # Resolve intent (LLM-first, keyword fallback)
+        intent, params = await self._resolve_intent(message)
+        logger.info(
+            "agent_intent_detected", intent=intent, session=sid, llm=llm_service.is_enabled
+        )
 
         response_text = ""
         action = None
+        tool_data: dict | None = None
 
         if intent == "yield_analysis":
             # Use wallet-specific risk tolerance if available, otherwise default to 50
             risk = params.get("risk_tolerance", 50)
             data = await get_yield_analysis(risk_tolerance=risk)
+            tool_data = data
             response_text = format_yield_response(data)
             action = {
                 "type": "yield",
@@ -402,6 +406,7 @@ class NeuroAgent:
                 amount=amount,
                 destination_strategy="vault",
             )
+            tool_data = data
             response_text = format_bridge_response(data)
             if data["status"] == "route_found":
                 route = data["bridge_route"]
@@ -411,14 +416,20 @@ class NeuroAgent:
                         "from": route["from_chain"],
                         "to": "Solana",
                         "amount": f"{route['from_amount']} {route['from_token']}",
+                        "to_amount": route.get("to_amount"),
                         "route": route["bridge_name"],
                         "gas": f"${route['estimated_gas']}",
                         "eta": f"~{route['estimated_time_seconds']}s",
+                        # Unsigned tx for on-device wallet signing (custody stays client-side).
+                        "route_id": route.get("route_id"),
+                        "transaction_request": route.get("transaction_request"),
+                        "executable": route.get("transaction_request") is not None,
                     },
                 }
 
         elif intent == "portfolio_risk":
             data = await get_portfolio_risk(wallet_address=wallet_address)
+            tool_data = data
             response_text = format_risk_response(data)
             action = {
                 "type": "risk",
@@ -438,6 +449,13 @@ class NeuroAgent:
                 "- **Risk assessment** — Analyze your portfolio exposure\n\n"
                 "Just tell me what you'd like to do."
             )
+
+        # Upgrade the templated reply to a natural-language one when an LLM is
+        # configured. Falls back silently to the template on any failure.
+        if tool_data is not None and llm_service.is_enabled:
+            composed = await llm_service.compose_reply(message, intent, tool_data)
+            if composed:
+                response_text = composed
 
         self._sessions[sid].append({"role": "assistant", "content": response_text})
 

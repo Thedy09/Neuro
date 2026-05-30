@@ -105,37 +105,36 @@ class LiFiService:
         response.raise_for_status()
         return response
 
-    async def get_best_route(
+    @retry(
+        stop=stop_after_attempt(3),
+        wait=wait_exponential(multiplier=1, min=1, max=10),
+        retry=retry_if_exception_type((httpx.TimeoutException, httpx.ConnectError)),
+    )
+    async def _post_step_transaction(self, step: dict) -> httpx.Response:
+        response = await self.client.post("/advanced/stepTransaction", json=step)
+        response.raise_for_status()
+        return response
+
+    def _build_route_params(
         self,
         from_chain: str,
         from_token: str,
         amount: str,
-        destination_token: str = "USDC",
+        destination_token: str,
+        from_address: str | None,
+        to_address: str | None,
     ) -> dict:
-        """
-        Fetch the best cross-chain route to Solana via LI.FI.
-
-        Args:
-            from_chain: Source chain identifier (ETH, BASE, ARB, POL, BSC)
-            from_token: Source token symbol or address
-            amount: Amount in smallest unit (wei)
-            destination_token: Destination token on Solana (default USDC)
-
-        Returns:
-            Parsed route with transaction data
-        """
         source_chain_id = CHAIN_IDS.get(from_chain.upper())
         if source_chain_id is None:
             raise ValueError(f"Unsupported source chain: {from_chain}")
 
-        # Resolve token addresses
         source_tokens = TOKEN_ADDRESSES.get(source_chain_id, {})
         from_token_address = source_tokens.get(from_token.upper(), from_token)
 
         dest_tokens = TOKEN_ADDRESSES.get(SOLANA_CHAIN_ID, {})
         to_token_address = dest_tokens.get(destination_token.upper(), destination_token)
 
-        params = {
+        params: dict = {
             "fromChainId": source_chain_id,
             "toChainId": SOLANA_CHAIN_ID,
             "fromTokenAddress": from_token_address,
@@ -147,15 +146,15 @@ class LiFiService:
                 "allowSwitchChain": True,
             },
         }
+        # Addresses are required for LI.FI to return executable transaction data.
+        if from_address:
+            params["fromAddress"] = from_address
+        if to_address:
+            params["toAddress"] = to_address
+        return params
 
-        logger.info(
-            "lifi_quote_request",
-            from_chain=from_chain,
-            from_token=from_token,
-            amount=amount,
-            dest=destination_token,
-        )
-
+    async def _request_routes(self, params: dict) -> list[dict]:
+        """POST /advanced/routes and return the raw routes list (mapped errors)."""
         try:
             response = await self._post_advanced_routes(params)
         except RetryError as e:
@@ -169,11 +168,47 @@ class LiFiService:
                 f"Cause: {last!s}"
             ) from last
 
-        data = response.json()
-
-        routes = data.get("routes", [])
+        routes = response.json().get("routes", [])
         if not routes:
             raise ValueError("No routes found for this transfer")
+        return routes
+
+    async def get_best_route(
+        self,
+        from_chain: str,
+        from_token: str,
+        amount: str,
+        destination_token: str = "USDC",
+        from_address: str | None = None,
+        to_address: str | None = None,
+    ) -> dict:
+        """
+        Fetch the best cross-chain route to Solana via LI.FI.
+
+        Args:
+            from_chain: Source chain identifier (ETH, BASE, ARB, POL, BSC)
+            from_token: Source token symbol or address
+            amount: Amount in smallest unit (wei)
+            destination_token: Destination token on Solana (default USDC)
+            from_address: Source EVM wallet (enables executable transaction data)
+            to_address: Destination Solana wallet
+
+        Returns:
+            Parsed route with transaction data
+        """
+        params = self._build_route_params(
+            from_chain, from_token, amount, destination_token, from_address, to_address
+        )
+
+        logger.info(
+            "lifi_quote_request",
+            from_chain=from_chain,
+            from_token=from_token,
+            amount=amount,
+            dest=destination_token,
+        )
+
+        routes = await self._request_routes(params)
 
         # Select best route (first = recommended)
         best = routes[0]
@@ -220,6 +255,72 @@ class LiFiService:
         )
 
         return parsed_route
+
+    async def get_executable_transaction(
+        self,
+        from_chain: str,
+        from_token: str,
+        amount: str,
+        from_address: str,
+        to_address: str,
+        destination_token: str = "USDC",
+    ) -> dict:
+        """
+        Produce a ready-to-sign transaction for the first bridge step.
+
+        Custody is on-device: the backend never holds keys. This fetches the
+        recommended route *with* the user's addresses and resolves the first
+        step into an unsigned ``transactionRequest`` (to / data / value / gas /
+        chainId) that the wallet (MWA on mobile, wallet-standard on web) signs
+        and broadcasts. The completing call is the LI.FI status poll.
+
+        Returns:
+            ``{"route_id", "bridge_name", "from_chain", "to_chain",
+               "from_amount", "to_amount", "transaction_request",
+               "next_step"}``
+        """
+        if not from_address:
+            raise ValueError("from_address (source wallet) is required to execute a bridge")
+        if not to_address:
+            raise ValueError("to_address (destination Solana wallet) is required")
+
+        params = self._build_route_params(
+            from_chain, from_token, amount, destination_token, from_address, to_address
+        )
+        routes = await self._request_routes(params)
+        best = routes[0]
+        steps = best.get("steps", [])
+        if not steps:
+            raise ValueError("Route has no executable steps")
+
+        first_step = steps[0]
+        tx_request = first_step.get("transactionRequest")
+        if tx_request is None:
+            # Routes don't always inline the tx; resolve it explicitly.
+            step_resp = await self._post_step_transaction(first_step)
+            tx_request = step_resp.json().get("transactionRequest")
+
+        if not tx_request:
+            raise ValueError("LI.FI did not return a signable transaction for this route")
+
+        result = {
+            "route_id": best.get("id", ""),
+            "bridge_name": (
+                steps[0].get("toolDetails", {}).get("name", "Unknown") if steps else "Unknown"
+            ),
+            "from_chain": from_chain.upper(),
+            "to_chain": "SOL",
+            "from_amount": best.get("fromAmount", amount),
+            "to_amount": best.get("toAmount", "0"),
+            "transaction_request": tx_request,
+            "next_step": "Sign and broadcast transaction_request in your wallet, then poll /status",
+        }
+        logger.info(
+            "lifi_executable_built",
+            route_id=result["route_id"],
+            bridge=result["bridge_name"],
+        )
+        return result
 
     @retry(
         stop=stop_after_attempt(3),

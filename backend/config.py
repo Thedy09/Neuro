@@ -36,6 +36,16 @@ class Settings(BaseSettings):
     ELEVENLABS_API_KEY: str = Field(default="")
     ELEVENLABS_AGENT_ID: str = Field(default="")
 
+    # LLM (optional) — upgrades /chat from keyword routing to a real model.
+    # Anthropic is used when ANTHROPIC_API_KEY is set. Otherwise any
+    # OpenAI-compatible endpoint can be used via LLM_API_KEY + LLM_BASE_URL.
+    # When no key is configured the agent gracefully falls back to keyword routing.
+    ANTHROPIC_API_KEY: str = Field(default="")
+    ANTHROPIC_MODEL: str = Field(default="claude-haiku-4-5-20251001")
+    LLM_API_KEY: str = Field(default="")
+    LLM_BASE_URL: str = Field(default="https://api.openai.com/v1")
+    LLM_MODEL: str = Field(default="gpt-4o-mini")
+
     # Agent WebSocket — if set, clients must pass the same value as query param `token`
     AGENT_WS_TOKEN: str = Field(default="")
 
