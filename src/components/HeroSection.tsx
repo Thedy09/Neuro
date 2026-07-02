@@ -4,6 +4,7 @@ import { ArrowRight, Shield, Zap, Globe } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useWallet } from '@solana/wallet-adapter-react';
 import VoiceOrb from './VoiceOrb';
+import { CLUSTER_LABEL } from '@/lib/solanaConfig';
 
 const features = [
   { icon: Zap, label: 'AI-Powered', desc: 'Natural language DeFi execution' },
@@ -34,7 +35,7 @@ const HeroSection: React.FC = () => {
         >
           <span className="w-1.5 h-1.5 rounded-full bg-success animate-pulse" />
           <span className="text-xs font-medium text-muted-foreground tracking-wide uppercase">
-            Solana Devnet Live
+            Solana {CLUSTER_LABEL} Live
           </span>
         </motion.div>
 

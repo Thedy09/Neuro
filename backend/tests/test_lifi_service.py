@@ -109,6 +109,48 @@ async def test_executable_resolves_step_transaction_when_missing():
     assert result["transaction_request"] == {"to": "0xstep", "data": "0xbeef"}
 
 
+async def test_integrator_fee_included_when_configured(monkeypatch):
+    from config import settings
+
+    monkeypatch.setattr(settings, "LIFI_INTEGRATOR", "neuro")
+    monkeypatch.setattr(settings, "LIFI_FEE", 0.0025)
+
+    captured: dict = {}
+
+    def handler(request: httpx.Request) -> httpx.Response:
+        import json
+
+        captured.update(json.loads(request.content))
+        return httpx.Response(200, json=_route_payload())
+
+    svc = await _make_service(handler)
+    await svc.get_best_route("BASE", "USDC", "300000000")
+
+    assert captured["options"]["integrator"] == "neuro"
+    assert captured["options"]["fee"] == 0.0025
+
+
+async def test_no_integrator_fee_by_default(monkeypatch):
+    from config import settings
+
+    monkeypatch.setattr(settings, "LIFI_INTEGRATOR", "")
+    monkeypatch.setattr(settings, "LIFI_FEE", 0.0)
+
+    captured: dict = {}
+
+    def handler(request: httpx.Request) -> httpx.Response:
+        import json
+
+        captured.update(json.loads(request.content))
+        return httpx.Response(200, json=_route_payload())
+
+    svc = await _make_service(handler)
+    await svc.get_best_route("BASE", "USDC", "300000000")
+
+    assert "integrator" not in captured["options"]
+    assert "fee" not in captured["options"]
+
+
 async def test_get_transaction_status_maps_fields():
     def handler(request: httpx.Request) -> httpx.Response:
         assert request.url.path.endswith("/status")

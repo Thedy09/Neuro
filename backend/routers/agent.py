@@ -8,6 +8,7 @@ from fastapi import (
     File,
     Form,
     HTTPException,
+    Request,
     Response,
     UploadFile,
     WebSocket,
@@ -20,9 +21,32 @@ import structlog
 from config import settings
 from services.agent_service import neuro_agent
 from services.elevenlabs_service import ElevenLabsService, elevenlabs_service
+from services.usage_service import usage_service
 
 logger = structlog.get_logger()
 router = APIRouter()
+
+
+def _voice_identity(request: Request, wallet_address: str | None) -> str:
+    """Quota identity: wallet when provided, client IP otherwise."""
+    if wallet_address and wallet_address.strip():
+        return f"wallet:{wallet_address.strip()}"
+    client_ip = request.client.host if request.client else "unknown"
+    return f"ip:{client_ip}"
+
+
+def _enforce_voice_quota(request: Request, wallet_address: str | None) -> None:
+    """Raise 429 when the free daily voice allowance is exhausted."""
+    identity = _voice_identity(request, wallet_address)
+    result = usage_service.check_and_increment(identity, wallet_address)
+    if not result["allowed"]:
+        raise HTTPException(
+            status_code=429,
+            detail=(
+                "Free daily voice limit reached "
+                f"({result['limit']} requests/day). Upgrade to NEURO Pro for unlimited voice."
+            ),
+        )
 
 
 class AgentChatRequest(BaseModel):
@@ -99,14 +123,16 @@ class VoiceSignedUrlRequest(BaseModel):
     """Optional override; defaults to server ELEVENLABS_AGENT_ID."""
 
     agent_id: str | None = Field(default=None, max_length=128)
+    wallet_address: str | None = Field(default=None, max_length=64)
 
 
 @router.post("/voice/signed-url")
-async def voice_signed_url(body: VoiceSignedUrlRequest):
+async def voice_signed_url(body: VoiceSignedUrlRequest, request: Request):
     """
     Returns a short-lived signed WebSocket URL so the browser can connect to ConvAI
     without embedding the ElevenLabs API key. Required for private agents.
     """
+    _enforce_voice_quota(request, body.wallet_address)
     if not settings.ELEVENLABS_API_KEY:
         raise HTTPException(
             status_code=503,
@@ -147,15 +173,17 @@ class VoiceTtsRequest(BaseModel):
     text: str = Field(..., min_length=1, max_length=2000)
     voice_id: str | None = Field(default=None, max_length=64)
     model_id: str | None = Field(default=None, max_length=64)
+    wallet_address: str | None = Field(default=None, max_length=64)
 
 
 @router.post("/voice/tts")
-async def voice_tts(body: VoiceTtsRequest):
+async def voice_tts(body: VoiceTtsRequest, request: Request):
     """
     Server-side ElevenLabs Text-To-Speech.
     Returns an audio/mpeg stream so mobile clients can play it directly
     without ever seeing the API key.
     """
+    _enforce_voice_quota(request, body.wallet_address)
     if not settings.ELEVENLABS_API_KEY:
         raise HTTPException(
             status_code=503,
@@ -200,13 +228,16 @@ async def voice_tts(body: VoiceTtsRequest):
 
 @router.post("/voice/stt")
 async def voice_stt(
+    request: Request,
     file: UploadFile = File(..., description="Audio file (m4a, wav, mp3, ogg)"),
     language_code: str | None = Form(default=None),
+    wallet_address: str | None = Form(default=None),
 ):
     """
     Server-side ElevenLabs Scribe Speech-To-Text.
     Returns the transcript so the mobile client never needs the API key.
     """
+    _enforce_voice_quota(request, wallet_address)
     if not settings.ELEVENLABS_API_KEY:
         raise HTTPException(
             status_code=503,
@@ -252,6 +283,13 @@ async def voice_stt(
         "language_code": payload.get("language_code"),
         "language_probability": payload.get("language_probability"),
     }
+
+
+@router.get("/voice/usage")
+async def voice_usage(request: Request, wallet_address: str | None = None):
+    """Today's voice usage for the caller (free tier) — drives paywall UI."""
+    identity = _voice_identity(request, wallet_address)
+    return usage_service.usage(identity, wallet_address)
 
 
 @router.get("/voice/capabilities")

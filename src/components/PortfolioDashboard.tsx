@@ -7,6 +7,7 @@ import { motion } from 'framer-motion';
 import { TrendingUp, TrendingDown, Shield, DollarSign, Layers, Activity, Loader2, WalletCards, AlertCircle, RefreshCw } from 'lucide-react';
 import { useWallet } from '@solana/wallet-adapter-react';
 import { useNeuroVault } from '@/hooks/useNeuroVault';
+import { CLUSTER_LABEL } from '@/lib/solanaConfig';
 
 const positions = [
   { protocol: 'Kamino', asset: 'USDC', deposited: '$4,200', apy: '8.2%', risk: 'Low', status: 'active' },
@@ -32,7 +33,7 @@ const PortfolioDashboard: React.FC = () => {
     {
       label: 'SOL Balance',
       value: connected ? `${solBalance.toFixed(4)} SOL` : '—',
-      change: connected ? 'Devnet' : '',
+      change: connected ? CLUSTER_LABEL : '',
       positive: true,
       icon: DollarSign,
       live: true,

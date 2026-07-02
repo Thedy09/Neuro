@@ -1,6 +1,7 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { ArrowUpRight, ArrowDownLeft, RefreshCw, Shield, ExternalLink, Filter } from 'lucide-react';
+import { CLUSTER_LABEL, explorerTxUrl } from '@/lib/solanaConfig';
 
 interface Transaction {
   id: string;
@@ -105,7 +106,7 @@ const TransactionHistory: React.FC = () => {
       <div className="flex items-center justify-between">
         <div>
           <h2 className="text-lg font-semibold text-foreground">Transaction History</h2>
-          <p className="text-xs text-muted-foreground">{transactions.length} transactions on Solana Devnet</p>
+          <p className="text-xs text-muted-foreground">{transactions.length} transactions on Solana {CLUSTER_LABEL}</p>
         </div>
         <button className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-muted-foreground border border-border rounded-lg hover:text-foreground hover:border-primary/30 transition-all">
           <Filter className="w-3 h-3" />
@@ -153,7 +154,7 @@ const TransactionHistory: React.FC = () => {
                     <p className="text-[10px] text-muted-foreground">{tx.timestamp}</p>
                   </div>
                   <a
-                    href={`https://explorer.solana.com/tx/${tx.signature}?cluster=devnet`}
+                    href={explorerTxUrl(tx.signature)}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="p-1.5 rounded-md hover:bg-secondary transition-colors"

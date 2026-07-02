@@ -2,7 +2,7 @@ import React, { useCallback, useEffect } from "react";
 import { View, Text, Pressable, Alert } from "react-native";
 import { useRouter } from "expo-router";
 import Animated, { FadeInDown } from "react-native-reanimated";
-import { useWalletStore } from "../src/store/walletStore";
+import { useWalletStore, CLUSTER_LABEL } from "../src/store/walletStore";
 
 const WALLETS = [
   {
@@ -45,7 +45,7 @@ export default function ConnectScreen() {
           error instanceof Error ? error.message : String(error);
         Alert.alert(
           "Wallet connection failed",
-          `${walletName}: ${message}\n\nMake sure a Solana wallet (Solflare or Phantom) is installed and configured for Devnet.`
+          `${walletName}: ${message}\n\nMake sure a Solana wallet (Solflare or Phantom) is installed and configured for ${CLUSTER_LABEL}.`
         );
       }
     },

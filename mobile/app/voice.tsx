@@ -31,7 +31,7 @@ const STATE_LABELS: Record<VoiceState, string> = {
 const DEMO_PROMPTS = [
   "Move 300 USDC from Base to Solana and pick the best yield",
   "What is my current portfolio risk score?",
-  "Recommend a conservative yield strategy on Solana devnet",
+  "Recommend a conservative yield strategy on Solana",
   "Bridge 0.05 ETH from Arbitrum to Solana",
 ];
 

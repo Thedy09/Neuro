@@ -24,6 +24,9 @@ class Settings(BaseSettings):
     CORS_ORIGINS: list[str] = Field(default=["http://localhost:5173", "http://localhost:3000"])
 
     # Solana
+    # SOLANA_CLUSTER: "devnet" (default) or "mainnet-beta" (production).
+    # RPC URLs must be set consistently with the cluster (QuickNode overrides below).
+    SOLANA_CLUSTER: str = Field(default="devnet")
     SOLANA_RPC_URL: str = Field(default="https://api.devnet.solana.com")
     SOLANA_WS_URL: str = Field(default="wss://api.devnet.solana.com")
     NEURO_PROGRAM_ID: str = Field(default="E7RAJWfEmSAm3NRR4Z2YBqw27fTGazBY2eGzypmFoCnT")
@@ -31,6 +34,14 @@ class Settings(BaseSettings):
     # LI.FI
     LIFI_API_URL: str = Field(default="https://li.quest/v1")
     LIFI_API_KEY: str = Field(default="")
+
+    # Monetization — integrator fee on LI.FI bridge volume (transaction-fee
+    # business model). Register the integrator name and the fee-collection
+    # wallet on https://portal.li.fi/, then set both values here.
+    # LIFI_FEE is a fraction of the bridged amount (e.g. 0.0025 = 0.25%).
+    # With no integrator configured, routes are requested without fees.
+    LIFI_INTEGRATOR: str = Field(default="")
+    LIFI_FEE: float = Field(default=0.0, ge=0.0, le=0.1)
 
     # ElevenLabs
     ELEVENLABS_API_KEY: str = Field(default="")
@@ -48,6 +59,15 @@ class Settings(BaseSettings):
 
     # Agent WebSocket — if set, clients must pass the same value as query param `token`
     AGENT_WS_TOKEN: str = Field(default="")
+
+    # Monetization — freemium voice quotas.
+    # Voice (ElevenLabs TTS/STT/ConvAI) is the main variable cost. The free tier
+    # gets VOICE_FREE_DAILY_REQUESTS voice calls per identity per day (0 = unlimited).
+    # PRO_WALLETS is a JSON list of wallet addresses with unlimited voice
+    # (subscribers), e.g. ["9x...abc","3f...def"]. Replace with an on-chain or
+    # Stripe-backed subscription check when billing is wired up.
+    VOICE_FREE_DAILY_REQUESTS: int = Field(default=0, ge=0)
+    PRO_WALLETS: list[str] = Field(default_factory=list)
 
     # QuickNode
     QUICKNODE_RPC_URL: str = Field(default="")

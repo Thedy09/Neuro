@@ -26,6 +26,7 @@ import { useNavigate } from 'react-router-dom';
 import { useWallet } from '@solana/wallet-adapter-react';
 import VoiceSessionPanel from './VoiceSessionPanel';
 import VoiceConfigModal, { getStoredAgentId, storeAgentId } from './VoiceConfigModal';
+import UpgradeProModal from './UpgradeProModal';
 import {
   useElevenLabsVoice,
   type VoiceTranscript,
@@ -148,6 +149,7 @@ const ChatInterface: React.FC = () => {
   // ── Voice state ────────────────────────────────────────────────────────
   const [voiceMode, setVoiceMode] = useState(false);
   const [showConfigModal, setShowConfigModal] = useState(false);
+  const [showUpgradeModal, setShowUpgradeModal] = useState(false);
   const [agentId, setAgentId] = useState<string>(getStoredAgentId() || '');
 
   // Track transcripts we already added to messages to avoid duplicates
@@ -212,8 +214,13 @@ const ChatInterface: React.FC = () => {
   const voice = useElevenLabsVoice({
     agentId,
     signedUrlEndpoint: getVoiceSignedUrlEndpoint(),
+    walletAddress: publicKey?.toBase58(),
     onTranscript: handleTranscript,
     onToolCall: handleToolCall,
+    onQuotaExceeded: () => {
+      setVoiceMode(false);
+      setShowUpgradeModal(true);
+    },
     onError: (err) => {
       setMessages((prev) => [
         ...prev,
@@ -377,6 +384,10 @@ const ChatInterface: React.FC = () => {
           }}
           onConfirm={handleConfigConfirm}
         />
+        <UpgradeProModal
+          open={showUpgradeModal}
+          onClose={() => setShowUpgradeModal(false)}
+        />
       </>
     );
   }
@@ -516,6 +527,10 @@ const ChatInterface: React.FC = () => {
         open={showConfigModal}
         onClose={() => setShowConfigModal(false)}
         onConfirm={handleConfigConfirm}
+      />
+      <UpgradeProModal
+        open={showUpgradeModal}
+        onClose={() => setShowUpgradeModal(false)}
       />
     </>
   );

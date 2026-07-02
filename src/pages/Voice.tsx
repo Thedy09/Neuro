@@ -20,17 +20,20 @@ import {
   Zap,
   PhoneOff,
 } from 'lucide-react';
+import { useWallet } from '@solana/wallet-adapter-react';
 import VoiceOrb from '@/components/VoiceOrb';
 import VoiceConfigModal, {
   getStoredAgentId,
   storeAgentId,
 } from '@/components/VoiceConfigModal';
+import UpgradeProModal from '@/components/UpgradeProModal';
 import {
   useElevenLabsVoice,
   type VoiceState,
   type ToolCall,
 } from '@/hooks/useElevenLabsVoice';
 import { getVoiceSignedUrlEndpoint } from '@/lib/voiceBackend';
+import { getVoiceUsage, isNeuroApiConfigured, type VoiceUsage } from '@/lib/neuroApi';
 
 // ── Immersive waveform ───────────────────────────────────────────────────────
 
@@ -139,10 +142,25 @@ const STATE_HINTS: Record<VoiceState, string> = {
 const Voice: React.FC = () => {
   const navigate = useNavigate();
   const transcriptRef = useRef<HTMLDivElement>(null);
+  const { publicKey } = useWallet();
 
   const [showConfig, setShowConfig] = useState(false);
   const [agentId, setAgentId] = useState<string>(getStoredAgentId() || '');
   const [showTranscripts, setShowTranscripts] = useState(true);
+  const [showUpgrade, setShowUpgrade] = useState(false);
+  const [usage, setUsage] = useState<VoiceUsage | null>(null);
+
+  // ── Voice quota (freemium) ───────────────────────────────────────────
+  const walletAddress = publicKey?.toBase58();
+
+  const refreshUsage = useCallback(() => {
+    if (!isNeuroApiConfigured()) return;
+    getVoiceUsage(walletAddress)
+      .then(setUsage)
+      .catch(() => setUsage(null));
+  }, [walletAddress]);
+
+  useEffect(refreshUsage, [refreshUsage]);
 
   // ── Tool call handler ────────────────────────────────────────────────
   const handleToolCall = useCallback(async (tool: ToolCall): Promise<string> => {
@@ -182,11 +200,21 @@ const Voice: React.FC = () => {
   const voice = useElevenLabsVoice({
     agentId,
     signedUrlEndpoint: getVoiceSignedUrlEndpoint(),
+    walletAddress,
     onToolCall: handleToolCall,
     onError: () => {
       // Errors are visible in transcript panel via state
     },
+    onQuotaExceeded: () => {
+      refreshUsage();
+      setShowUpgrade(true);
+    },
   });
+
+  // Each started session consumes one free-tier request — keep the counter fresh.
+  useEffect(() => {
+    if (voice.conversationId) refreshUsage();
+  }, [voice.conversationId, refreshUsage]);
 
   // ── Auto-scroll transcripts ──────────────────────────────────────────
   useEffect(() => {
@@ -267,6 +295,23 @@ const Voice: React.FC = () => {
           {voice.conversationId && (
             <span className="hidden sm:inline text-[10px] font-mono text-muted-foreground px-2 py-0.5 rounded-full border border-border">
               {voice.conversationId.slice(0, 8)}
+            </span>
+          )}
+          {usage && usage.is_pro && (
+            <span className="text-[10px] font-semibold text-primary px-2 py-0.5 rounded-full border border-primary/30 bg-primary/10 uppercase tracking-wider">
+              Pro
+            </span>
+          )}
+          {usage && !usage.is_pro && usage.limit > 0 && (
+            <span
+              className={`text-[10px] font-mono px-2 py-0.5 rounded-full border ${
+                usage.remaining === 0
+                  ? 'text-destructive border-destructive/30 bg-destructive/10'
+                  : 'text-muted-foreground border-border'
+              }`}
+              title="Free voice interactions remaining today"
+            >
+              {usage.remaining}/{usage.limit} today
             </span>
           )}
         </div>
@@ -477,6 +522,13 @@ const Voice: React.FC = () => {
         open={showConfig}
         onClose={() => setShowConfig(false)}
         onConfirm={handleConfigConfirm}
+      />
+
+      {/* ── Pro paywall (free daily voice limit reached) ────────────────── */}
+      <UpgradeProModal
+        open={showUpgrade}
+        onClose={() => setShowUpgrade(false)}
+        dailyLimit={usage?.limit && usage.limit > 0 ? usage.limit : undefined}
       />
     </div>
   );

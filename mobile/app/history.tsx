@@ -2,6 +2,7 @@ import React from "react";
 import { View, Text, ScrollView, Pressable, Linking } from "react-native";
 import Animated, { FadeInDown } from "react-native-reanimated";
 import { Header } from "../src/components/Header";
+import { CLUSTER_LABEL, explorerTxUrl } from "../src/store/walletStore";
 
 const TRANSACTIONS = [
   { type: "deposit", desc: "Vault Deposit", amount: "+$2,000", sig: "4xKm...bQ9p", time: "2h ago", status: "confirmed" },
@@ -29,7 +30,7 @@ export default function HistoryScreen() {
         showsVerticalScrollIndicator={false}
       >
         <Text className="text-neuro-muted text-xs mt-4 mb-3">
-          {TRANSACTIONS.length} transactions on Solana Devnet
+          {TRANSACTIONS.length} transactions on Solana {CLUSTER_LABEL}
         </Text>
 
         {TRANSACTIONS.map((tx, i) => {
@@ -41,11 +42,7 @@ export default function HistoryScreen() {
             >
               <Pressable
                 className="bg-neuro-surface border border-neuro-border rounded-xl p-4 mb-3 active:bg-neuro-card"
-                onPress={() =>
-                  Linking.openURL(
-                    `https://explorer.solana.com/tx/${tx.sig}?cluster=devnet`
-                  )
-                }
+                onPress={() => Linking.openURL(explorerTxUrl(tx.sig))}
               >
                 <View className="flex-row items-center justify-between">
                   <View className="flex-row items-center gap-3">

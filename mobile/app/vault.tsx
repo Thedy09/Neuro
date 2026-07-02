@@ -2,7 +2,12 @@ import React, { useEffect, useState } from "react";
 import { View, Text, ScrollView, Pressable, Alert, Linking } from "react-native";
 import Animated, { FadeInDown } from "react-native-reanimated";
 import { Header } from "../src/components/Header";
-import { useWalletStore } from "../src/store/walletStore";
+import {
+  useWalletStore,
+  IS_MAINNET,
+  CLUSTER_LABEL,
+  explorerTxUrl,
+} from "../src/store/walletStore";
 
 const YIELD_OPS = [
   { protocol: "Jito", type: "Liquid Staking", apy: 7.1, risk: "Low", liquidity: 98 },
@@ -51,7 +56,7 @@ export default function VaultScreen() {
     setBusy("airdrop");
     try {
       const sig = await airdropDevnet();
-      Alert.alert("Airdrop confirmed", `1 SOL devnet received.\n\nSig: ${sig.slice(0, 24)}...`);
+      Alert.alert("Airdrop confirmed", `1 SOL ${CLUSTER_LABEL} received.\n\nSig: ${sig.slice(0, 24)}...`);
     } catch (e) {
       Alert.alert("Airdrop failed", e instanceof Error ? e.message : String(e));
     } finally {
@@ -77,10 +82,7 @@ export default function VaultScreen() {
           { text: "Cancel", style: "cancel" },
           {
             text: "OK",
-            onPress: () =>
-              Linking.openURL(
-                `https://explorer.solana.com/tx/${sig}?cluster=devnet`
-              ),
+            onPress: () => Linking.openURL(explorerTxUrl(sig)),
           },
         ]
       );
@@ -132,7 +134,7 @@ export default function VaultScreen() {
                   solBalance != null ? `${solBalance.toFixed(4)} SOL` : "—",
               },
               { label: "Vault PDA", value: trunc(vaultAddress) },
-              { label: "Cluster", value: "devnet" },
+              { label: "Cluster", value: CLUSTER_LABEL },
             ].map((item) => (
               <View key={item.label} className="w-1/2">
                 <Text className="text-neuro-muted text-[10px] uppercase tracking-wider mb-0.5">
@@ -150,19 +152,23 @@ export default function VaultScreen() {
           entering={FadeInDown.delay(150).duration(500)}
           className="mt-4 gap-3"
         >
-          <Pressable
-            onPress={onAirdrop}
-            disabled={!connected || busy !== null}
-            className={`rounded-xl py-3 items-center border ${
-              connected && !busy
-                ? "border-neuro-border bg-neuro-surface active:bg-neuro-card"
-                : "border-neuro-border bg-neuro-surface opacity-40"
-            }`}
-          >
-            <Text className="text-white text-sm font-semibold">
-              {busy === "airdrop" ? "Requesting airdrop..." : "Airdrop 1 SOL (devnet)"}
-            </Text>
-          </Pressable>
+          {!IS_MAINNET && (
+            <Pressable
+              onPress={onAirdrop}
+              disabled={!connected || busy !== null}
+              className={`rounded-xl py-3 items-center border ${
+                connected && !busy
+                  ? "border-neuro-border bg-neuro-surface active:bg-neuro-card"
+                  : "border-neuro-border bg-neuro-surface opacity-40"
+              }`}
+            >
+              <Text className="text-white text-sm font-semibold">
+                {busy === "airdrop"
+                  ? "Requesting airdrop..."
+                  : `Airdrop 1 SOL (${CLUSTER_LABEL})`}
+              </Text>
+            </Pressable>
+          )}
 
           <Pressable
             onPress={onSignAndDeposit}
@@ -182,11 +188,7 @@ export default function VaultScreen() {
 
           {lastTxSignature && (
             <Pressable
-              onPress={() =>
-                Linking.openURL(
-                  `https://explorer.solana.com/tx/${lastTxSignature}?cluster=devnet`
-                )
-              }
+              onPress={() => Linking.openURL(explorerTxUrl(lastTxSignature))}
               className="bg-neuro-card border border-neuro-border rounded-xl p-3"
             >
               <Text className="text-neuro-muted text-[10px] uppercase tracking-wider mb-1">

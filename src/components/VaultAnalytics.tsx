@@ -23,6 +23,7 @@ import {
 import { useWallet } from '@solana/wallet-adapter-react';
 import { LAMPORTS_PER_SOL } from '@solana/web3.js';
 import { useNeuroVault } from '@/hooks/useNeuroVault';
+import { CLUSTER_LABEL, explorerTxUrl } from '@/lib/solanaConfig';
 
 // ── Yield data (static — these are off-chain protocol APYs) ──────────────────
 
@@ -66,7 +67,7 @@ const StatusBanner: React.FC<{ type: 'success' | 'error'; message: string; signa
       <span>{message}</span>
       {signature && (
         <a
-          href={`https://explorer.solana.com/tx/${signature}?cluster=devnet`}
+          href={explorerTxUrl(signature)}
           target="_blank"
           rel="noopener noreferrer"
           className="inline-flex items-center gap-1 underline opacity-80 hover:opacity-100"
@@ -175,7 +176,7 @@ const VaultAnalytics: React.FC = () => {
     return (
       <div className="flex flex-col items-center justify-center py-20 gap-3">
         <Loader2 className="w-6 h-6 text-primary animate-spin" />
-        <p className="text-xs text-muted-foreground">Loading vault from Solana Devnet...</p>
+        <p className="text-xs text-muted-foreground">Loading vault from Solana {CLUSTER_LABEL}...</p>
       </div>
     );
   }

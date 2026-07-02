@@ -59,4 +59,9 @@ app.include_router(webhook_router, prefix="/api/v1/webhooks", tags=["Webhooks"])
 
 @app.get("/health")
 async def health_check():
-    return {"status": "ok", "service": "neuro-api", "version": "1.0.0"}
+    return {
+        "status": "ok",
+        "service": "neuro-api",
+        "version": "1.0.0",
+        "cluster": settings.SOLANA_CLUSTER,
+    }

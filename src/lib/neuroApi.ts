@@ -22,6 +22,30 @@ export function isNeuroApiConfigured(): boolean {
   return apiBase() !== null;
 }
 
+export interface VoiceUsage {
+  used: number;
+  /** -1 = unlimited (Pro tier or quotas disabled) */
+  remaining: number;
+  limit: number;
+  is_pro: boolean;
+}
+
+/** Today's voice quota for the caller — drives the paywall UI. */
+export async function getVoiceUsage(walletAddress?: string): Promise<VoiceUsage> {
+  const base = apiBase();
+  if (!base) {
+    throw new Error('VITE_API_URL is not set — cannot reach NEURO backend');
+  }
+  const params = walletAddress
+    ? `?wallet_address=${encodeURIComponent(walletAddress)}`
+    : '';
+  const res = await fetch(`${base}/api/v1/agent/voice/usage${params}`);
+  if (!res.ok) {
+    throw new Error(`HTTP ${res.status}`);
+  }
+  return res.json() as Promise<VoiceUsage>;
+}
+
 export async function postAgentChat(body: {
   message: string;
   wallet_address?: string;

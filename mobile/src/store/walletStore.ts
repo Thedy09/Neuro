@@ -13,8 +13,34 @@ import {
 } from "@solana/web3.js";
 import bs58 from "bs58";
 
+// Cluster is env-driven: "devnet" (default) or "mainnet-beta" (production).
+// RPC and program ID must be set consistently with the cluster at build time.
+const RAW_CLUSTER = (process.env.EXPO_PUBLIC_SOLANA_CLUSTER || "devnet")
+  .trim()
+  .toLowerCase();
+export const SOLANA_CLUSTER: "devnet" | "testnet" | "mainnet-beta" =
+  RAW_CLUSTER === "mainnet-beta" || RAW_CLUSTER === "mainnet"
+    ? "mainnet-beta"
+    : RAW_CLUSTER === "testnet"
+    ? "testnet"
+    : "devnet";
+export const IS_MAINNET = SOLANA_CLUSTER === "mainnet-beta";
+export const CLUSTER_LABEL = IS_MAINNET
+  ? "mainnet"
+  : SOLANA_CLUSTER === "testnet"
+  ? "testnet"
+  : "devnet";
+
+export function explorerTxUrl(signature: string): string {
+  const suffix = IS_MAINNET ? "" : `?cluster=${SOLANA_CLUSTER}`;
+  return `https://explorer.solana.com/tx/${signature}${suffix}`;
+}
+
 const RPC_URL =
-  process.env.EXPO_PUBLIC_SOLANA_RPC || "https://api.devnet.solana.com";
+  process.env.EXPO_PUBLIC_SOLANA_RPC ||
+  (IS_MAINNET
+    ? "https://api.mainnet-beta.solana.com"
+    : `https://api.${SOLANA_CLUSTER}.solana.com`);
 const PROGRAM_ID_STR =
   process.env.EXPO_PUBLIC_PROGRAM_ID ||
   "E7RAJWfEmSAm3NRR4Z2YBqw27fTGazBY2eGzypmFoCnT";
@@ -90,7 +116,7 @@ export const useWalletStore = create<WalletState>((set, get) => ({
     try {
       await transact(async (wallet: Web3MobileWallet) => {
         const authResult = await wallet.authorize({
-          cluster: "devnet",
+          cluster: SOLANA_CLUSTER,
           identity: {
             name: "NEURO",
             uri: "https://neuro.app",
@@ -191,6 +217,7 @@ export const useWalletStore = create<WalletState>((set, get) => ({
   },
 
   airdropDevnet: async () => {
+    if (IS_MAINNET) throw new Error("Airdrop is not available on mainnet");
     const { publicKey } = get();
     if (!publicKey) throw new Error("Not connected");
     const sig = await connection.requestAirdrop(publicKey, LAMPORTS_PER_SOL);

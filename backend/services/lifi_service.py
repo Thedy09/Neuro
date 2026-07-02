@@ -134,17 +134,24 @@ class LiFiService:
         dest_tokens = TOKEN_ADDRESSES.get(SOLANA_CHAIN_ID, {})
         to_token_address = dest_tokens.get(destination_token.upper(), destination_token)
 
+        options: dict = {
+            "slippage": 0.005,
+            "order": "RECOMMENDED",
+            "allowSwitchChain": True,
+        }
+        # Integrator fee (monetization): collected by LI.FI on each bridge and
+        # paid out to the wallet registered on portal.li.fi for this integrator.
+        if settings.LIFI_INTEGRATOR and settings.LIFI_FEE > 0:
+            options["integrator"] = settings.LIFI_INTEGRATOR
+            options["fee"] = settings.LIFI_FEE
+
         params: dict = {
             "fromChainId": source_chain_id,
             "toChainId": SOLANA_CHAIN_ID,
             "fromTokenAddress": from_token_address,
             "toTokenAddress": to_token_address,
             "fromAmount": amount,
-            "options": {
-                "slippage": 0.005,
-                "order": "RECOMMENDED",
-                "allowSwitchChain": True,
-            },
+            "options": options,
         }
         # Addresses are required for LI.FI to return executable transaction data.
         if from_address:

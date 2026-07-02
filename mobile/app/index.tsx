@@ -7,7 +7,7 @@ import Animated, {
   FadeInUp,
 } from "react-native-reanimated";
 import { VoiceOrb } from "../src/components/VoiceOrb";
-import { useWalletStore } from "../src/store/walletStore";
+import { useWalletStore, CLUSTER_LABEL } from "../src/store/walletStore";
 
 export default function OnboardingScreen() {
   const router = useRouter();
@@ -36,7 +36,7 @@ export default function OnboardingScreen() {
           <View className="flex-row items-center bg-neuro-surface border border-neuro-border rounded-full px-4 py-2 mb-8">
             <View className="w-2 h-2 rounded-full bg-neuro-success mr-2" />
             <Text className="text-neuro-muted text-xs font-mono uppercase tracking-widest">
-              Solana Devnet Live
+              Solana {CLUSTER_LABEL} Live
             </Text>
           </View>
         </Animated.View>

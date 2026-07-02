@@ -14,7 +14,7 @@ const FooterSection: React.FC = () => {
             <span className="text-xs text-muted-foreground">v1.0.0</span>
           </div>
           <p className="text-xs text-muted-foreground">
-            AI-Powered Cross-Chain Wealth OS on Solana. Built for hackathon demo.
+            AI-Powered Cross-Chain Wealth OS on Solana.
           </p>
           <div className="flex items-center gap-4">
             <a href="#" className="text-xs text-muted-foreground hover:text-primary transition-colors">GitHub</a>

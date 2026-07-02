@@ -34,10 +34,14 @@ export interface UseElevenLabsVoiceOptions {
   agentId: string;
   /** Optional: use a signed URL endpoint instead of public agent */
   signedUrlEndpoint?: string;
+  /** Wallet identity for voice quotas (Pro wallets bypass the free-tier limit) */
+  walletAddress?: string;
   onTranscript?: (transcript: VoiceTranscript) => void;
   onToolCall?: (tool: ToolCall) => Promise<string>;
   onError?: (error: string) => void;
   onStateChange?: (state: VoiceState) => void;
+  /** Called when the backend rejects the session with HTTP 429 (free daily voice limit) */
+  onQuotaExceeded?: () => void;
 }
 
 export interface UseElevenLabsVoiceReturn {
@@ -87,7 +91,16 @@ function arrayBufferToBase64(buffer: ArrayBuffer): string {
 // ── Hook ─────────────────────────────────────────────────────────────────────
 
 export function useElevenLabsVoice(options: UseElevenLabsVoiceOptions): UseElevenLabsVoiceReturn {
-  const { agentId, signedUrlEndpoint, onTranscript, onToolCall, onError, onStateChange } = options;
+  const {
+    agentId,
+    signedUrlEndpoint,
+    walletAddress,
+    onTranscript,
+    onToolCall,
+    onError,
+    onStateChange,
+    onQuotaExceeded,
+  } = options;
 
   const [state, setState] = useState<VoiceState>('idle');
   const [transcripts, setTranscripts] = useState<VoiceTranscript[]>([]);
@@ -388,8 +401,17 @@ export function useElevenLabsVoice(options: UseElevenLabsVoiceOptions): UseEleve
         const res = await fetch(signedUrlEndpoint, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ agent_id: agentId || undefined }),
+          body: JSON.stringify({
+            agent_id: agentId || undefined,
+            wallet_address: walletAddress || undefined,
+          }),
         });
+        if (res.status === 429) {
+          // Free daily voice limit reached — surface the paywall, not a raw error.
+          updateState('idle');
+          onQuotaExceeded?.();
+          return;
+        }
         if (!res.ok) {
           const errText = await res.text();
           throw new Error(
@@ -464,11 +486,13 @@ export function useElevenLabsVoice(options: UseElevenLabsVoiceOptions): UseEleve
     state,
     agentId,
     signedUrlEndpoint,
+    walletAddress,
     updateState,
     startMicrophone,
     startVolumeMonitor,
     handleMessage,
     onError,
+    onQuotaExceeded,
   ]);
 
   // ── Stop conversation ──────────────���───────────────────────────────────
