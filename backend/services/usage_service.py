@@ -15,6 +15,7 @@ import time
 import structlog
 
 from config import settings
+from services.pro_service import pro_service
 
 logger = structlog.get_logger()
 
@@ -38,9 +39,8 @@ class UsageService:
 
     @staticmethod
     def is_pro(wallet_address: str | None) -> bool:
-        if not wallet_address:
-            return False
-        return wallet_address.strip() in settings.PRO_WALLETS
+        # Covers both the PRO_WALLETS manual list and on-chain subscriptions.
+        return pro_service.is_pro(wallet_address)
 
     def check_and_increment(
         self, identity: str, wallet_address: str | None = None

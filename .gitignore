@@ -44,6 +44,9 @@ contracts/target/
 *.log
 contracts/logs/
 
+# Runtime data (Pro subscriptions store)
+backend/data/
+
 # Local-only notes (not published)
 docs/DEPLOY_DEMO.md
 HACKATHON_CHECKLIST.md

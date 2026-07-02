@@ -529,6 +529,7 @@ const Voice: React.FC = () => {
         open={showUpgrade}
         onClose={() => setShowUpgrade(false)}
         dailyLimit={usage?.limit && usage.limit > 0 ? usage.limit : undefined}
+        onSubscribed={refreshUsage}
       />
     </div>
   );

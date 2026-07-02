@@ -12,7 +12,7 @@ from slowapi.util import get_remote_address
 from slowapi.errors import RateLimitExceeded
 
 from config import settings
-from routers import bridge_router, agent_router, vault_router, webhook_router
+from routers import bridge_router, agent_router, vault_router, webhook_router, pro_router
 from services.lifecycle import lifespan
 
 structlog.configure(
@@ -55,6 +55,7 @@ app.include_router(bridge_router, prefix="/api/v1/bridge", tags=["Bridge"])
 app.include_router(agent_router, prefix="/api/v1/agent", tags=["Agent"])
 app.include_router(vault_router, prefix="/api/v1/vault", tags=["Vault"])
 app.include_router(webhook_router, prefix="/api/v1/webhooks", tags=["Webhooks"])
+app.include_router(pro_router, prefix="/api/v1/pro", tags=["Pro"])
 
 
 @app.get("/health")

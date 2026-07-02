@@ -64,10 +64,17 @@ class Settings(BaseSettings):
     # Voice (ElevenLabs TTS/STT/ConvAI) is the main variable cost. The free tier
     # gets VOICE_FREE_DAILY_REQUESTS voice calls per identity per day (0 = unlimited).
     # PRO_WALLETS is a JSON list of wallet addresses with unlimited voice
-    # (subscribers), e.g. ["9x...abc","3f...def"]. Replace with an on-chain or
-    # Stripe-backed subscription check when billing is wired up.
+    # (manual override; on-chain subscriptions below are the primary path).
     VOICE_FREE_DAILY_REQUESTS: int = Field(default=0, ge=0)
     PRO_WALLETS: list[str] = Field(default_factory=list)
+
+    # Monetization — on-chain Pro subscription.
+    # Users pay PRO_PRICE_SOL to PRO_TREASURY_WALLET (plain SOL transfer);
+    # the backend verifies the transaction on-chain and activates Pro for
+    # PRO_DURATION_DAYS. Feature is disabled while PRO_TREASURY_WALLET is empty.
+    PRO_TREASURY_WALLET: str = Field(default="")
+    PRO_PRICE_SOL: float = Field(default=0.5, gt=0)
+    PRO_DURATION_DAYS: int = Field(default=30, gt=0)
 
     # QuickNode
     QUICKNODE_RPC_URL: str = Field(default="")
