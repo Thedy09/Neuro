@@ -1,50 +1,26 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { Brain, ArrowRight, Server, Smartphone, Shield, Layers } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
-const layers = [
-  {
-    icon: Smartphone,
-    title: 'Frontend Layer',
-    desc: 'React Web + React Native mobile with voice AI interface',
-    tech: ['React 18', 'Expo', 'Zustand', 'NativeWind'],
-    color: 'primary',
-  },
-  {
-    icon: Brain,
-    title: 'AI Agent Layer',
-    desc: 'ElevenLabs conversational agent with DeFi tool calling',
-    tech: ['ElevenLabs', 'WebSocket', 'Tool Calling', 'Streaming'],
-    color: 'primary',
-  },
-  {
-    icon: Server,
-    title: 'Backend Layer',
-    desc: 'FastAPI async backend with LI.FI and QuickNode integration',
-    tech: ['FastAPI', 'LI.FI', 'QuickNode', 'Pydantic v2'],
-    color: 'primary',
-  },
-  {
-    icon: Shield,
-    title: 'Smart Contract Layer',
-    desc: 'Anchor-based Risk-Weighted Vault system on Solana',
-    tech: ['Anchor', 'Rust', 'PDA Vaults', 'Risk Scoring'],
-    color: 'primary',
-  },
-];
-
-const flowSteps = [
-  'User speaks to NEURO',
-  'AI parses intent',
-  'Fetches LI.FI route',
-  'Prepares bridge TX',
-  'User signs on wallet',
-  'Funds arrive on Solana',
-  'Deposits into vault',
-  'AI confirms via voice',
-];
+const LAYER_META = [
+  { key: 'frontend', icon: Smartphone, tech: ['React 18', 'Expo', 'Zustand', 'NativeWind'] },
+  { key: 'ai', icon: Brain, tech: ['ElevenLabs', 'WebSocket', 'Tool Calling', 'Streaming'] },
+  { key: 'backend', icon: Server, tech: ['FastAPI', 'LI.FI', 'QuickNode', 'Pydantic v2'] },
+  { key: 'contracts', icon: Shield, tech: ['Anchor', 'Rust', 'PDA Vaults', 'Risk Scoring'] },
+] as const;
 
 const ArchitectureSection: React.FC = () => {
+  const { t } = useTranslation();
+
+  const layers = LAYER_META.map((meta) => ({
+    ...meta,
+    title: t(`architecture.layers.${meta.key}.title`),
+    desc: t(`architecture.layers.${meta.key}.desc`),
+  }));
+
+  const flowSteps = t('architecture.flow', { returnObjects: true }) as string[];
+
   return (
     <section id="architecture" className="relative py-24 overflow-hidden">
       <div className="absolute inset-0 dot-pattern opacity-20" />
@@ -59,13 +35,13 @@ const ArchitectureSection: React.FC = () => {
         >
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-border bg-secondary/50 mb-4">
             <Layers className="w-3.5 h-3.5 text-primary" />
-            <span className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Architecture</span>
+            <span className="text-xs font-medium text-muted-foreground uppercase tracking-wide">{t('architecture.badge')}</span>
           </div>
           <h2 className="text-3xl sm:text-4xl font-bold text-foreground mb-4">
-            Full-Stack <span className="gradient-text">Monorepo</span>
+            {t('architecture.title')}<span className="gradient-text">{t('architecture.titleGradient')}</span>
           </h2>
           <p className="text-muted-foreground max-w-xl mx-auto">
-            Production-grade infrastructure from voice input to on-chain execution.
+            {t('architecture.subtitle')}
           </p>
         </motion.div>
 
@@ -112,7 +88,7 @@ const ArchitectureSection: React.FC = () => {
         >
           <h3 className="text-sm font-semibold text-foreground mb-6 flex items-center gap-2">
             <ArrowRight className="w-4 h-4 text-primary" />
-            Transaction Flow
+            {t('architecture.flowTitle')}
           </h3>
           <div className="flex flex-wrap items-center justify-center gap-2">
             {flowSteps.map((step, i) => (

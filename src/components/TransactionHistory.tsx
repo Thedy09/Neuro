@@ -1,12 +1,14 @@
 import React from 'react';
 import { motion } from 'framer-motion';
+import { useTranslation } from 'react-i18next';
 import { ArrowUpRight, ArrowDownLeft, RefreshCw, Shield, ExternalLink, Filter } from 'lucide-react';
 import { CLUSTER_LABEL, explorerTxUrl } from '@/lib/solanaConfig';
 
 interface Transaction {
   id: string;
   type: 'deposit' | 'bridge' | 'risk_update' | 'withdrawal';
-  description: string;
+  descriptionKey: string;
+  descriptionParams?: Record<string, string>;
   amount: string;
   from?: string;
   to?: string;
@@ -19,7 +21,7 @@ const transactions: Transaction[] = [
   {
     id: '1',
     type: 'deposit',
-    description: 'Vault Deposit',
+    descriptionKey: 'history.descriptions.vaultDeposit',
     amount: '+$2,000.00',
     to: 'NEURO Vault',
     signature: '4xKm7nBr2pQw8vLc3dFh9sYm5tRk6wJb',
@@ -29,7 +31,8 @@ const transactions: Transaction[] = [
   {
     id: '2',
     type: 'bridge',
-    description: 'Bridge from Base',
+    descriptionKey: 'history.descriptions.bridgeFrom',
+    descriptionParams: { chain: 'Base' },
     amount: '+$300.00',
     from: 'Base (USDC)',
     to: 'Solana (USDC)',
@@ -40,7 +43,7 @@ const transactions: Transaction[] = [
   {
     id: '3',
     type: 'risk_update',
-    description: 'Risk Score Updated',
+    descriptionKey: 'history.descriptions.riskUpdated',
     amount: '38 -> 34',
     signature: '2mQx5rT5vBn8kL3wPf7sYd9nGh4jRm6t',
     timestamp: '2026-05-07 18:45',
@@ -49,7 +52,7 @@ const transactions: Transaction[] = [
   {
     id: '4',
     type: 'deposit',
-    description: 'Vault Deposit',
+    descriptionKey: 'history.descriptions.vaultDeposit',
     amount: '+$5,120.00',
     to: 'NEURO Vault',
     signature: '9vBc2nH8kLm4wPf6sYd7tRj3qGh5xKn9',
@@ -59,7 +62,8 @@ const transactions: Transaction[] = [
   {
     id: '5',
     type: 'bridge',
-    description: 'Bridge from Ethereum',
+    descriptionKey: 'history.descriptions.bridgeFrom',
+    descriptionParams: { chain: 'Ethereum' },
     amount: '+$1,000.00',
     from: 'Ethereum (USDC)',
     to: 'Solana (USDC)',
@@ -70,7 +74,7 @@ const transactions: Transaction[] = [
   {
     id: '6',
     type: 'deposit',
-    description: 'Vault Deposit',
+    descriptionKey: 'history.descriptions.vaultDeposit',
     amount: '+$1,000.00',
     to: 'NEURO Vault',
     signature: '3kWm8nPr5vLc2dFh7sYt4rQx9bGj6hN1',
@@ -100,17 +104,18 @@ const statusColors: Record<string, string> = {
 };
 
 const TransactionHistory: React.FC = () => {
+  const { t } = useTranslation();
   return (
     <div className="space-y-4">
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-lg font-semibold text-foreground">Transaction History</h2>
-          <p className="text-xs text-muted-foreground">{transactions.length} transactions on Solana {CLUSTER_LABEL}</p>
+          <h2 className="text-lg font-semibold text-foreground">{t('history.title')}</h2>
+          <p className="text-xs text-muted-foreground">{t('history.subtitle', { count: transactions.length, cluster: CLUSTER_LABEL })}</p>
         </div>
         <button className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-muted-foreground border border-border rounded-lg hover:text-foreground hover:border-primary/30 transition-all">
           <Filter className="w-3 h-3" />
-          Filter
+          {t('history.filter')}
         </button>
       </div>
 
@@ -132,13 +137,13 @@ const TransactionHistory: React.FC = () => {
                     <Icon className="w-4 h-4" />
                   </div>
                   <div>
-                    <p className="text-sm font-medium text-foreground">{tx.description}</p>
+                    <p className="text-sm font-medium text-foreground">{t(tx.descriptionKey, tx.descriptionParams)}</p>
                     <div className="flex items-center gap-2 mt-0.5">
                       <span className="text-[10px] font-mono text-muted-foreground">
                         {tx.signature.slice(0, 8)}...{tx.signature.slice(-4)}
                       </span>
                       <div className={`w-1.5 h-1.5 rounded-full ${statusColors[tx.status]}`} />
-                      <span className="text-[10px] text-muted-foreground capitalize">{tx.status}</span>
+                      <span className="text-[10px] text-muted-foreground capitalize">{t(`history.status.${tx.status}`)}</span>
                     </div>
                   </div>
                 </div>

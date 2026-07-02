@@ -1,43 +1,54 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { Code2 } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
-const stacks = [
+const STACK_META = [
   {
-    category: 'Smart Contracts',
+    categoryKey: 'contracts',
     items: [
-      { name: 'Anchor', desc: 'Solana framework' },
-      { name: 'Rust', desc: 'Program language' },
-      { name: 'PDA Vaults', desc: 'User accounts' },
+      { name: 'Anchor', descKey: 'anchor' },
+      { name: 'Rust', descKey: 'rust' },
+      { name: 'PDA Vaults', descKey: 'pda' },
     ],
   },
   {
-    category: 'Backend',
+    categoryKey: 'backend',
     items: [
-      { name: 'FastAPI', desc: 'Async Python API' },
-      { name: 'LI.FI', desc: 'Cross-chain routing' },
-      { name: 'QuickNode', desc: 'Solana streams' },
+      { name: 'FastAPI', descKey: 'fastapi' },
+      { name: 'LI.FI', descKey: 'lifi' },
+      { name: 'QuickNode', descKey: 'quicknode' },
     ],
   },
   {
-    category: 'AI / Voice',
+    categoryKey: 'ai',
     items: [
-      { name: 'ElevenLabs', desc: 'Conversational AI' },
-      { name: 'WebSocket', desc: 'Real-time streaming' },
-      { name: 'Tool Calling', desc: 'DeFi execution' },
+      { name: 'ElevenLabs', descKey: 'elevenlabs' },
+      { name: 'WebSocket', descKey: 'websocket' },
+      { name: 'Tool Calling', descKey: 'toolCalling' },
     ],
   },
   {
-    category: 'Frontend',
+    categoryKey: 'frontend',
     items: [
-      { name: 'React 18', desc: 'Web interface' },
-      { name: 'React Native', desc: 'Mobile app' },
-      { name: 'Zustand', desc: 'State management' },
+      { name: 'React 18', descKey: 'react' },
+      { name: 'React Native', descKey: 'reactNative' },
+      { name: 'Zustand', descKey: 'zustand' },
     ],
   },
-];
+] as const;
 
 const TechStackSection: React.FC = () => {
+  const { t } = useTranslation();
+
+  const stacks = STACK_META.map((stack) => ({
+    category: t(`techStack.categories.${stack.categoryKey}`),
+    items: stack.items.map((item) => ({
+      name: item.name,
+      desc: t(`techStack.items.${item.descKey}`),
+    })),
+  }));
+
   return (
     <section className="relative py-24 overflow-hidden">
       <div className="relative z-10 max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -49,10 +60,10 @@ const TechStackSection: React.FC = () => {
         >
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-border bg-secondary/50 mb-4">
             <Code2 className="w-3.5 h-3.5 text-primary" />
-            <span className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Tech Stack</span>
+            <span className="text-xs font-medium text-muted-foreground uppercase tracking-wide">{t('techStack.badge')}</span>
           </div>
           <h2 className="text-3xl sm:text-4xl font-bold text-foreground mb-4">
-            Built with <span className="gradient-text">Production</span> Tools
+            {t('techStack.title')}<span className="gradient-text">{t('techStack.titleGradient')}</span>{t('techStack.titleSuffix')}
           </h2>
         </motion.div>
 

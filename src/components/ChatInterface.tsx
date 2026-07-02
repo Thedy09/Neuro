@@ -23,6 +23,7 @@ import {
   Expand,
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { useWallet } from '@solana/wallet-adapter-react';
 import VoiceSessionPanel from './VoiceSessionPanel';
 import VoiceConfigModal, { getStoredAgentId, storeAgentId } from './VoiceConfigModal';
@@ -91,8 +92,13 @@ function detectIntent(msg: string): string {
 // ── ActionCard sub-component ─────────────────────────────────────────────────
 
 const ActionCard: React.FC<{ action: MessageAction }> = ({ action }) => {
+  const { t } = useTranslation();
   const icons = { bridge: Globe, yield: TrendingUp, risk: Shield };
-  const labels = { bridge: 'Bridge Route', yield: 'Yield Analysis', risk: 'Risk Assessment' };
+  const labels = {
+    bridge: t('chat.actionLabels.bridge'),
+    yield: t('chat.actionLabels.yield'),
+    risk: t('chat.actionLabels.risk'),
+  };
   const Icon = icons[action.type];
 
   return (
@@ -117,7 +123,7 @@ const ActionCard: React.FC<{ action: MessageAction }> = ({ action }) => {
       </div>
       {action.type === 'bridge' && (
         <button className="mt-3 w-full py-2 rounded-md text-xs font-medium bg-primary text-primary-foreground hover:opacity-90 transition-opacity flex items-center justify-center gap-1">
-          Execute Transaction <ArrowUpRight className="w-3 h-3" />
+          {t('chat.executeTransaction')} <ArrowUpRight className="w-3 h-3" />
         </button>
       )}
     </motion.div>
@@ -129,14 +135,14 @@ const ActionCard: React.FC<{ action: MessageAction }> = ({ action }) => {
 const ChatInterface: React.FC = () => {
   const navigate = useNavigate();
   const { publicKey } = useWallet();
+  const { t } = useTranslation();
 
-  // ── Text chat state ────────────────────────���───────────────────────────
-  const [messages, setMessages] = useState<Message[]>([
+  // ── Text chat state ────────────────────────────────────────────────────
+  const [messages, setMessages] = useState<Message[]>(() => [
     {
       id: '1',
       role: 'assistant',
-      content:
-        "Hello. I'm NEURO, your AI wealth operating system. I can bridge assets, analyze yield opportunities, and manage your vault risk. What would you like to do?",
+      content: t('chat.welcome'),
       timestamp: new Date(),
       source: 'text',
     },
@@ -227,7 +233,7 @@ const ChatInterface: React.FC = () => {
         {
           id: `error-${Date.now()}`,
           role: 'assistant',
-          content: `Voice error: ${err}`,
+          content: t('chat.voiceError', { error: err }),
           timestamp: new Date(),
           source: 'voice',
         },
@@ -312,9 +318,7 @@ const ChatInterface: React.FC = () => {
         {
           id: `err-${Date.now()}`,
           role: 'assistant',
-          content:
-            `I could not reach the NEURO API (${msg}). ` +
-            `Set **VITE_API_URL** in \`.env\` and run the FastAPI backend, or try again.`,
+          content: t('chat.apiError', { error: msg }),
           timestamp: new Date(),
           source: 'text',
         },
@@ -322,7 +326,7 @@ const ChatInterface: React.FC = () => {
     } finally {
       setIsTyping(false);
     }
-  }, [input, isTyping, publicKey]);
+  }, [input, isTyping, publicKey, t]);
 
   // ── Voice toggle handler ──────────────────────────────────────────────
   const handleVoiceToggle = useCallback(() => {
@@ -443,7 +447,7 @@ const ChatInterface: React.FC = () => {
                     </span>
                     {msg.source === 'voice' && (
                       <span className="px-1.5 py-0.5 text-[8px] font-medium rounded-full bg-primary/10 text-primary border border-primary/20">
-                        VOICE
+                        {t('chat.voiceBadge')}
                       </span>
                     )}
                   </div>
@@ -459,7 +463,7 @@ const ChatInterface: React.FC = () => {
               </div>
               <div className="bg-secondary/50 border border-border rounded-2xl rounded-tl-sm px-4 py-3 flex items-center gap-1.5">
                 <Loader2 className="w-3.5 h-3.5 text-primary animate-spin" />
-                <span className="text-xs text-muted-foreground">NEURO is thinking...</span>
+                <span className="text-xs text-muted-foreground">{t('chat.typing')}</span>
               </div>
             </motion.div>
           )}
@@ -474,16 +478,18 @@ const ChatInterface: React.FC = () => {
             <div className="flex flex-shrink-0 gap-1.5">
               <button
                 onClick={handleVoiceToggle}
-                className="relative w-12 h-12 rounded-full flex items-center justify-center border-2 border-border bg-secondary hover:border-primary/40 hover:bg-primary/10 transition-all group"
-                title="Inline voice mode"
+                aria-label={t('chat.startVoice')}
+                className="relative w-12 h-12 rounded-full flex items-center justify-center border-2 border-border bg-secondary hover:border-primary/40 hover:bg-primary/10 active:scale-95 transition-all group"
+                title={t('chat.inlineVoiceTitle')}
               >
                 <Mic className="w-5 h-5 text-muted-foreground group-hover:text-primary transition-colors" />
                 <span className="absolute -top-1 -right-1 w-3 h-3 rounded-full bg-success border-2 border-card animate-pulse" />
               </button>
               <button
                 onClick={() => navigate('/voice')}
-                className="w-12 h-12 rounded-full flex items-center justify-center border-2 border-border bg-secondary hover:border-primary/40 hover:bg-primary/10 transition-all group"
-                title="Fullscreen voice mode"
+                aria-label={t('chat.fullscreenVoice')}
+                className="w-12 h-12 rounded-full flex items-center justify-center border-2 border-border bg-secondary hover:border-primary/40 hover:bg-primary/10 active:scale-95 transition-all group"
+                title={t('chat.fullscreenVoiceTitle')}
               >
                 <Expand className="w-4 h-4 text-muted-foreground group-hover:text-primary transition-colors" />
               </button>
@@ -495,13 +501,15 @@ const ChatInterface: React.FC = () => {
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
                 onKeyDown={(e) => e.key === 'Enter' && handleSend()}
-                placeholder="Ask NEURO anything..."
+                placeholder={t('chat.placeholder')}
+                aria-label={t('chat.messageNeuro')}
                 className="flex-1 bg-transparent text-sm text-foreground placeholder:text-muted-foreground outline-none"
               />
               <button
                 onClick={handleSend}
                 disabled={!input.trim() || isTyping}
-                className="p-1.5 rounded-lg bg-primary text-primary-foreground disabled:opacity-30 hover:opacity-90 transition-opacity"
+                aria-label={t('chat.sendMessage')}
+                className="p-2 rounded-lg bg-primary text-primary-foreground disabled:opacity-30 hover:opacity-90 active:scale-95 transition-all"
               >
                 <Send className="w-3.5 h-3.5" />
               </button>
@@ -509,7 +517,7 @@ const ChatInterface: React.FC = () => {
           </div>
 
           <div className="flex items-center gap-2 mt-2 ml-[4.25rem]">
-            {['Bridge USDC from Base', 'Analyze my yield', 'Portfolio risk score'].map((q) => (
+            {[t('chat.suggestions.bridge'), t('chat.suggestions.yield'), t('chat.suggestions.risk')].map((q) => (
               <button
                 key={q}
                 onClick={() => setInput(q)}

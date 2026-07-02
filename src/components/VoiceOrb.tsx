@@ -1,5 +1,6 @@
 import React, { useState, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useTranslation } from 'react-i18next';
 import { Mic, MicOff, Volume2, Loader2 } from 'lucide-react';
 
 interface VoiceOrbProps {
@@ -25,6 +26,7 @@ const VoiceOrb: React.FC<VoiceOrbProps> = ({
   onToggle,
   size = 'md',
 }) => {
+  const { t } = useTranslation();
   const [internalListening, setInternalListening] = useState(false);
   const isListening = externalListening ?? internalListening;
   const config = sizeMap[size];
@@ -95,6 +97,8 @@ const VoiceOrb: React.FC<VoiceOrbProps> = ({
       {/* Main orb button */}
       <motion.button
         onClick={handleToggle}
+        aria-label={isActive ? t('voicePage.orbStop') : t('voicePage.orbStart')}
+        aria-pressed={isActive}
         whileHover={{ scale: 1.05 }}
         whileTap={{ scale: 0.95 }}
         animate={

@@ -11,6 +11,7 @@
 
 import React, { useRef, useEffect, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useTranslation } from 'react-i18next';
 import { X, Wifi, WifiOff, Bot, User, Loader2 } from 'lucide-react';
 import type { VoiceState, VoiceTranscript } from '@/hooks/useElevenLabsVoice';
 import VoiceOrb from './VoiceOrb';
@@ -22,22 +23,6 @@ interface VoiceSessionPanelProps {
   conversationId: string | null;
   onStop: () => void;
 }
-
-const STATE_LABELS: Record<VoiceState, string> = {
-  idle: 'Voice Inactive',
-  connecting: 'Connecting to NEURO...',
-  listening: 'Listening...',
-  processing: 'Processing...',
-  speaking: 'NEURO is speaking...',
-};
-
-const STATE_HINTS: Record<VoiceState, string> = {
-  idle: '',
-  connecting: 'Establishing secure voice channel',
-  listening: 'Speak naturally — I understand DeFi commands',
-  processing: 'Analyzing your request...',
-  speaking: 'Responding via voice...',
-};
 
 // Waveform visualization bar count
 const BAR_COUNT = 32;
@@ -77,6 +62,7 @@ const VoiceSessionPanel: React.FC<VoiceSessionPanelProps> = ({
   onStop,
 }) => {
   const scrollRef = useRef<HTMLDivElement>(null);
+  const { t } = useTranslation();
 
   useEffect(() => {
     scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: 'smooth' });
@@ -101,7 +87,7 @@ const VoiceSessionPanel: React.FC<VoiceSessionPanelProps> = ({
             <WifiOff className="w-3.5 h-3.5 text-muted-foreground" />
           )}
           <span className="text-xs font-medium text-foreground">
-            {STATE_LABELS[state]}
+            {t(`voicePanel.states.${state}`)}
           </span>
         </div>
         <div className="flex items-center gap-2">
@@ -112,7 +98,8 @@ const VoiceSessionPanel: React.FC<VoiceSessionPanelProps> = ({
           )}
           <button
             onClick={onStop}
-            className="p-1.5 rounded-md text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-colors"
+            aria-label={t('voicePanel.endSessionLabel')}
+            className="p-1.5 rounded-md text-muted-foreground hover:text-destructive hover:bg-destructive/10 active:scale-95 transition-all"
           >
             <X className="w-4 h-4" />
           </button>
@@ -128,7 +115,7 @@ const VoiceSessionPanel: React.FC<VoiceSessionPanelProps> = ({
         />
         <WaveformVisualizer volume={volume} isActive={isListeningOrSpeaking} />
         <p className="text-xs text-muted-foreground font-mono text-center px-8">
-          {STATE_HINTS[state]}
+          {t(`voicePanel.hints.${state}`)}
         </p>
       </div>
 
@@ -177,7 +164,7 @@ const VoiceSessionPanel: React.FC<VoiceSessionPanelProps> = ({
             </div>
             <div className="bg-secondary/50 border border-border rounded-xl rounded-tl-sm px-3 py-2 flex items-center gap-1.5">
               <Loader2 className="w-3 h-3 text-primary animate-spin" />
-              <span className="text-xs text-muted-foreground">Thinking...</span>
+              <span className="text-xs text-muted-foreground">{t('common.thinking')}</span>
             </div>
           </motion.div>
         )}
@@ -189,7 +176,7 @@ const VoiceSessionPanel: React.FC<VoiceSessionPanelProps> = ({
           onClick={onStop}
           className="w-full py-2.5 rounded-xl text-sm font-medium bg-destructive/10 text-destructive border border-destructive/20 hover:bg-destructive/20 transition-colors"
         >
-          End Voice Session
+          {t('voicePanel.endVoiceSession')}
         </button>
       </div>
     </motion.div>

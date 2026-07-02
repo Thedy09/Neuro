@@ -1,0 +1,285 @@
+{
+  "common": {
+    "cancel": "Cancel",
+    "close": "Close",
+    "retry": "Retry",
+    "refresh": "Refresh",
+    "dismiss": "dismiss",
+    "loading": "Loading page",
+    "connected": "CONNECTED",
+    "thinking": "Thinking..."
+  },
+  "nav": {
+    "dashboard": "Dashboard",
+    "voice": "Voice",
+    "docs": "Docs",
+    "openMenu": "Open menu",
+    "closeMenu": "Close menu"
+  },
+  "hero": {
+    "badge": "Solana {{cluster}} Live",
+    "titleLine1": "Your AI ",
+    "titleGradient": "Wealth",
+    "titleLine2": "Operating System",
+    "subtitle": "Speak naturally. NEURO understands, bridges, deposits, and optimizes your cross-chain yield on Solana.",
+    "orbHint": "\"Move 300 USDC from Base to Solana and optimize my yield\"",
+    "ctaConnected": "Launch Dashboard",
+    "ctaDisconnected": "Connect Wallet to Start",
+    "ctaVoice": "Try Voice Mode",
+    "features": {
+      "ai": { "label": "AI-Powered", "desc": "Natural language DeFi execution" },
+      "crossChain": { "label": "Cross-Chain", "desc": "Bridge any chain to Solana" },
+      "risk": { "label": "Risk-Managed", "desc": "Smart vault risk scoring" }
+    }
+  },
+  "architecture": {
+    "badge": "Architecture",
+    "title": "Full-Stack ",
+    "titleGradient": "Monorepo",
+    "subtitle": "Production-grade infrastructure from voice input to on-chain execution.",
+    "layers": {
+      "frontend": { "title": "Frontend Layer", "desc": "React Web + React Native mobile with voice AI interface" },
+      "ai": { "title": "AI Agent Layer", "desc": "ElevenLabs conversational agent with DeFi tool calling" },
+      "backend": { "title": "Backend Layer", "desc": "FastAPI async backend with LI.FI and QuickNode integration" },
+      "contracts": { "title": "Smart Contract Layer", "desc": "Anchor-based Risk-Weighted Vault system on Solana" }
+    },
+    "flowTitle": "Transaction Flow",
+    "flow": [
+      "User speaks to NEURO",
+      "AI parses intent",
+      "Fetches LI.FI route",
+      "Prepares bridge TX",
+      "User signs on wallet",
+      "Funds arrive on Solana",
+      "Deposits into vault",
+      "AI confirms via voice"
+    ]
+  },
+  "techStack": {
+    "badge": "Tech Stack",
+    "title": "Built with ",
+    "titleGradient": "Production",
+    "titleSuffix": " Tools",
+    "categories": {
+      "contracts": "Smart Contracts",
+      "backend": "Backend",
+      "ai": "AI / Voice",
+      "frontend": "Frontend"
+    },
+    "items": {
+      "anchor": "Solana framework",
+      "rust": "Program language",
+      "pda": "User accounts",
+      "fastapi": "Async Python API",
+      "lifi": "Cross-chain routing",
+      "quicknode": "Solana streams",
+      "elevenlabs": "Conversational AI",
+      "websocket": "Real-time streaming",
+      "toolCalling": "DeFi execution",
+      "react": "Web interface",
+      "reactNative": "Mobile app",
+      "zustand": "State management"
+    }
+  },
+  "footer": {
+    "tagline": "AI-Powered Cross-Chain Wealth OS on Solana."
+  },
+  "dashboard": {
+    "tabs": {
+      "voice": "Voice",
+      "chat": "AI Chat",
+      "portfolio": "Portfolio",
+      "vault": "Vault",
+      "history": "History"
+    }
+  },
+  "chat": {
+    "welcome": "Hello. I'm NEURO, your AI wealth operating system. I can bridge assets, analyze yield opportunities, and manage your vault risk. What would you like to do?",
+    "placeholder": "Ask NEURO anything...",
+    "sendMessage": "Send message",
+    "messageNeuro": "Message NEURO",
+    "typing": "NEURO is thinking...",
+    "voiceBadge": "VOICE",
+    "executeTransaction": "Execute Transaction",
+    "startVoice": "Start voice conversation",
+    "inlineVoiceTitle": "Inline voice mode",
+    "fullscreenVoice": "Open fullscreen voice mode",
+    "fullscreenVoiceTitle": "Fullscreen voice mode",
+    "voiceError": "Voice error: {{error}}",
+    "apiError": "I could not reach the NEURO API ({{error}}). Set **VITE_API_URL** in `.env` and run the FastAPI backend, or try again.",
+    "actionLabels": {
+      "bridge": "Bridge Route",
+      "yield": "Yield Analysis",
+      "risk": "Risk Assessment"
+    },
+    "suggestions": {
+      "bridge": "Bridge USDC from Base",
+      "yield": "Analyze my yield",
+      "risk": "Portfolio risk score"
+    }
+  },
+  "voicePage": {
+    "back": "Back",
+    "textChat": "Text Chat",
+    "settings": "Voice settings",
+    "proBadge": "Pro",
+    "quotaToday": "{{remaining}}/{{limit}} today",
+    "quotaTitle": "Free voice interactions remaining today",
+    "endSession": "End Session",
+    "transcript": "Transcript",
+    "waitingConversation": "Waiting for conversation...",
+    "startSessionHint": "Start a voice session to see transcripts here",
+    "poweredBy": "Voice powered by ElevenLabs Conversational AI",
+    "orbStart": "Start voice session",
+    "orbStop": "Stop voice session",
+    "states": {
+      "idle": "Tap the orb to speak",
+      "connecting": "Connecting to NEURO...",
+      "listening": "Listening...",
+      "processing": "Processing your request...",
+      "speaking": "NEURO is responding..."
+    },
+    "hints": {
+      "idle": "\"Move 300 USDC from Base to Solana and optimize my yield\"",
+      "connecting": "Establishing secure voice channel",
+      "listening": "Speak naturally — I understand DeFi commands",
+      "processing": "Analyzing intent and fetching routes...",
+      "speaking": "Responding via voice..."
+    }
+  },
+  "voicePanel": {
+    "endVoiceSession": "End Voice Session",
+    "endSessionLabel": "End voice session",
+    "states": {
+      "idle": "Voice Inactive",
+      "connecting": "Connecting to NEURO...",
+      "listening": "Listening...",
+      "processing": "Processing...",
+      "speaking": "NEURO is speaking..."
+    },
+    "hints": {
+      "idle": "",
+      "connecting": "Establishing secure voice channel",
+      "listening": "Speak naturally — I understand DeFi commands",
+      "processing": "Analyzing your request...",
+      "speaking": "Responding via voice..."
+    }
+  },
+  "voiceConfig": {
+    "title": "Connect ElevenLabs Voice",
+    "subtitle": "Enter your ElevenLabs Conversational AI Agent ID to enable real-time voice interaction with NEURO.",
+    "agentIdLabel": "Agent ID",
+    "placeholder": "e.g. abc123def456...",
+    "info": "Create a free conversational AI agent at ElevenLabs, then paste the agent ID here. Your ID is stored locally in this browser only.",
+    "createAgent": "Create Agent",
+    "startVoice": "Start Voice",
+    "dialogLabel": "Voice agent configuration"
+  },
+  "upgradePro": {
+    "dialogLabel": "Upgrade to NEURO Pro",
+    "successTitle": "Welcome to NEURO Pro",
+    "successBody": "Your subscription is active{{duration}}. Voice is now unlimited on this wallet.",
+    "successDuration": " for {{days}} days",
+    "startTalking": "Start talking",
+    "limitTitle": "Daily voice limit reached",
+    "limitBodyWithCount": "You've used your {{count}} free voice interactions for today. ",
+    "limitBody": "You've used your free voice interactions for today. ",
+    "limitUpgrade": "Upgrade to NEURO Pro for unlimited voice — or come back tomorrow.",
+    "features": {
+      "voice": "Unlimited voice sessions",
+      "analytics": "Advanced portfolio analytics",
+      "alerts": "Real-time risk alerts",
+      "multiWallet": "Multi-wallet support"
+    },
+    "maybeLater": "Maybe later",
+    "signInWallet": "Sign in wallet...",
+    "verifying": "Verifying...",
+    "pay": "Pay {{price}} SOL",
+    "contactUs": "Contact us",
+    "connectToPay": "Connect wallet to pay",
+    "paymentNote": "One transaction of {{price}} SOL from your wallet — {{days}} days of Pro. Non-custodial: you sign, we verify on-chain."
+  },
+  "portfolio": {
+    "connectPrompt": "Connect your wallet to view portfolio",
+    "solBalance": "SOL Balance",
+    "vaultDeposited": "Vault Deposited",
+    "noVault": "No vault",
+    "onChain": "On-chain",
+    "avgApy": "Avg APY",
+    "riskScore": "Risk Score",
+    "activePositions": "Active Positions",
+    "positionsCount": "{{count}} positions",
+    "chainAllocation": "Chain Allocation",
+    "risk": { "Low": "Low", "Medium": "Medium", "High": "High" }
+  },
+  "vault": {
+    "connectPrompt": "Connect your wallet to view vault data",
+    "loading": "Loading vault from Solana {{cluster}}...",
+    "createTitle": "Create Your Vault",
+    "createSubtitle": "Initialize a PDA vault on Solana to track your deposits and risk preferences on-chain.",
+    "riskTolerance": "Risk Tolerance: {{score}}/100 — {{label}}",
+    "initialize": "Initialize Vault",
+    "initializing": "Initializing...",
+    "solBalanceLabel": "SOL Balance: {{balance}} SOL",
+    "program": "Program",
+    "pdaVault": "PDA Vault",
+    "onChainBadge": "On-Chain",
+    "activeBadge": "Active",
+    "owner": "Owner",
+    "totalDeposited": "Total Deposited",
+    "solBalance": "SOL Balance",
+    "pdaBump": "PDA Bump",
+    "solAmount": "SOL amount",
+    "trackDeposit": "Track Deposit",
+    "trackNewDeposit": "Track New Deposit",
+    "riskToleranceTitle": "Risk Tolerance",
+    "adjust": "Adjust",
+    "closeEditor": "Close",
+    "profileLabel": "{{label}} Profile",
+    "riskScoreDesc": "On-chain risk score {{score}}/100 stored in your PDA vault.",
+    "newScore": "New Score: {{score}} — {{label}}",
+    "updateRisk": "Update Risk Score On-Chain",
+    "yieldOpportunities": "Yield Opportunities",
+    "riskLabel": "Risk:",
+    "liquidityLabel": "Liquidity:",
+    "yieldOps": {
+      "jito": { "type": "Liquid Staking", "recommendation": "Conservative pick. Reliable yield with high liquidity." },
+      "kamino": { "type": "USDC Vault", "recommendation": "Best risk-adjusted return for stablecoin exposure." },
+      "drift": { "type": "USDC-SOL LP", "recommendation": "Higher yield. Suitable for medium risk tolerance." },
+      "marginfi": { "type": "Lending", "recommendation": "Most conservative. Lending with high liquidity." }
+    },
+    "riskLevels": {
+      "conservative": "Conservative",
+      "moderate": "Moderate",
+      "growth": "Growth",
+      "aggressive": "Aggressive"
+    },
+    "riskShort": { "Low": "Low", "Medium": "Medium", "High": "High" },
+    "messages": {
+      "initialized": "Vault initialized!",
+      "riskUpdated": "Risk score updated to {{score}}",
+      "depositTracked": "Tracked deposit of {{amount}} SOL",
+      "invalidAmount": "Enter a valid amount",
+      "failed": "Failed"
+    }
+  },
+  "history": {
+    "title": "Transaction History",
+    "subtitle": "{{count}} transactions on Solana {{cluster}}",
+    "filter": "Filter",
+    "descriptions": {
+      "vaultDeposit": "Vault Deposit",
+      "bridgeFrom": "Bridge from {{chain}}",
+      "riskUpdated": "Risk Score Updated"
+    },
+    "status": {
+      "confirmed": "confirmed",
+      "pending": "pending",
+      "failed": "failed"
+    }
+  },
+  "notFound": {
+    "message": "Oops! Page not found",
+    "returnHome": "Return to Home"
+  }
+}

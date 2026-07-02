@@ -1,7 +1,9 @@
 import React from 'react';
 import { Zap } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 const FooterSection: React.FC = () => {
+  const { t } = useTranslation();
   return (
     <footer className="relative border-t border-border py-12">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -14,12 +16,25 @@ const FooterSection: React.FC = () => {
             <span className="text-xs text-muted-foreground">v1.0.0</span>
           </div>
           <p className="text-xs text-muted-foreground">
-            AI-Powered Cross-Chain Wealth OS on Solana.
+            {t('footer.tagline')}
           </p>
           <div className="flex items-center gap-4">
-            <a href="#" className="text-xs text-muted-foreground hover:text-primary transition-colors">GitHub</a>
-            <a href="#" className="text-xs text-muted-foreground hover:text-primary transition-colors">Docs</a>
-            <a href="#" className="text-xs text-muted-foreground hover:text-primary transition-colors">Twitter</a>
+            <a
+              href="https://github.com/Thedy09/Neuro"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-xs text-muted-foreground hover:text-primary transition-colors"
+            >
+              GitHub
+            </a>
+            <a
+              href="https://github.com/Thedy09/Neuro/tree/main/docs"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-xs text-muted-foreground hover:text-primary transition-colors"
+            >
+              Docs
+            </a>
           </div>
         </div>
       </div>

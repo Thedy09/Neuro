@@ -4,17 +4,20 @@ import { WalletMultiButton } from '@solana/wallet-adapter-react-ui';
 import { useWallet } from '@solana/wallet-adapter-react';
 import { Menu, X, Zap } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
-
-const navLinks = [
-  { label: 'Dashboard', href: '/dashboard' },
-  { label: 'Voice', href: '/voice' },
-  { label: 'Docs', href: '#docs' },
-];
+import { useTranslation } from 'react-i18next';
+import LanguageSwitcher from './LanguageSwitcher';
 
 const Header: React.FC = () => {
   const [mobileOpen, setMobileOpen] = useState(false);
   const { connected } = useWallet();
   const location = useLocation();
+  const { t } = useTranslation();
+
+  const navLinks = [
+    { label: t('nav.dashboard'), href: '/dashboard' },
+    { label: t('nav.voice'), href: '/voice' },
+    { label: t('nav.docs'), href: '#docs' },
+  ];
 
   return (
     <header className="fixed top-0 left-0 right-0 z-50 glass-strong">
@@ -31,7 +34,7 @@ const Header: React.FC = () => {
             </span>
             {connected && (
               <span className="hidden sm:inline-flex px-2 py-0.5 text-[10px] font-mono font-semibold rounded-full bg-success/10 text-success border border-success/20">
-                CONNECTED
+                {t('common.connected')}
               </span>
             )}
           </Link>
@@ -40,7 +43,7 @@ const Header: React.FC = () => {
           <nav className="hidden md:flex items-center gap-1">
             {navLinks.map((link) => (
               <Link
-                key={link.label}
+                key={link.href}
                 to={link.href}
                 className={`px-3 py-1.5 text-sm font-medium rounded-md transition-colors ${
                   location.pathname === link.href
@@ -54,11 +57,14 @@ const Header: React.FC = () => {
           </nav>
 
           {/* Right side */}
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2">
+            <LanguageSwitcher />
             <WalletMultiButton />
             <button
-              className="md:hidden p-2 rounded-md text-muted-foreground hover:text-foreground hover:bg-secondary transition-colors"
+              className="md:hidden p-2 rounded-md text-muted-foreground hover:text-foreground hover:bg-secondary active:scale-95 transition-all"
               onClick={() => setMobileOpen(!mobileOpen)}
+              aria-label={mobileOpen ? t('nav.closeMenu') : t('nav.openMenu')}
+              aria-expanded={mobileOpen}
             >
               {mobileOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
             </button>
@@ -78,7 +84,7 @@ const Header: React.FC = () => {
             <div className="px-4 py-3 space-y-1">
               {navLinks.map((link) => (
                 <Link
-                  key={link.label}
+                  key={link.href}
                   to={link.href}
                   onClick={() => setMobileOpen(false)}
                   className="block px-3 py-2 text-sm font-medium rounded-md text-muted-foreground hover:text-foreground hover:bg-secondary transition-colors"

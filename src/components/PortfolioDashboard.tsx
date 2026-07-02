@@ -4,6 +4,7 @@
 
 import React from 'react';
 import { motion } from 'framer-motion';
+import { useTranslation } from 'react-i18next';
 import { TrendingUp, TrendingDown, Shield, DollarSign, Layers, Activity, Loader2, WalletCards, AlertCircle, RefreshCw } from 'lucide-react';
 import { useWallet } from '@solana/wallet-adapter-react';
 import { useNeuroVault } from '@/hooks/useNeuroVault';
@@ -24,6 +25,7 @@ const riskColors: Record<string, string> = {
 
 const PortfolioDashboard: React.FC = () => {
   const { connected } = useWallet();
+  const { t } = useTranslation();
   const { vault, vaultExists, vaultLoading, vaultError, solBalance, sdk, refreshVault } = useNeuroVault();
 
   const totalDepositedSol = vault ? (sdk?.toSol(vault.totalDeposited) ?? 0) : 0;
@@ -31,7 +33,7 @@ const PortfolioDashboard: React.FC = () => {
 
   const stats = [
     {
-      label: 'SOL Balance',
+      label: t('portfolio.solBalance'),
       value: connected ? `${solBalance.toFixed(4)} SOL` : '—',
       change: connected ? CLUSTER_LABEL : '',
       positive: true,
@@ -39,15 +41,15 @@ const PortfolioDashboard: React.FC = () => {
       live: true,
     },
     {
-      label: 'Vault Deposited',
-      value: vaultExists ? `${totalDepositedSol.toFixed(4)} SOL` : connected ? 'No vault' : '—',
-      change: vaultExists ? 'On-chain' : '',
+      label: t('portfolio.vaultDeposited'),
+      value: vaultExists ? `${totalDepositedSol.toFixed(4)} SOL` : connected ? t('portfolio.noVault') : '—',
+      change: vaultExists ? t('portfolio.onChain') : '',
       positive: true,
       icon: Layers,
       live: vaultExists,
     },
     {
-      label: 'Avg APY',
+      label: t('portfolio.avgApy'),
       value: '9.4%',
       change: '+0.6%',
       positive: true,
@@ -55,9 +57,9 @@ const PortfolioDashboard: React.FC = () => {
       live: false,
     },
     {
-      label: 'Risk Score',
+      label: t('portfolio.riskScore'),
       value: vaultExists ? `${riskScore}/100` : connected ? '—' : '—',
-      change: vaultExists ? 'On-chain' : '',
+      change: vaultExists ? t('portfolio.onChain') : '',
       positive: true,
       icon: Shield,
       live: vaultExists,
@@ -68,7 +70,7 @@ const PortfolioDashboard: React.FC = () => {
     return (
       <div className="flex flex-col items-center justify-center py-20 gap-4">
         <WalletCards className="w-10 h-10 text-muted-foreground" />
-        <p className="text-sm text-muted-foreground">Connect your wallet to view portfolio</p>
+        <p className="text-sm text-muted-foreground">{t('portfolio.connectPrompt')}</p>
       </div>
     );
   }
@@ -86,7 +88,7 @@ const PortfolioDashboard: React.FC = () => {
             className="inline-flex items-center gap-1.5 rounded-md border border-destructive/20 px-2.5 py-1 text-xs text-destructive hover:bg-destructive/10"
           >
             <RefreshCw className="w-3 h-3" />
-            Retry
+            {t('common.retry')}
           </button>
         </div>
       )}
@@ -131,9 +133,9 @@ const PortfolioDashboard: React.FC = () => {
         <div className="px-5 py-4 border-b border-border flex items-center justify-between">
           <div className="flex items-center gap-2">
             <Activity className="w-4 h-4 text-primary" />
-            <h3 className="text-sm font-semibold text-foreground">Active Positions</h3>
+            <h3 className="text-sm font-semibold text-foreground">{t('portfolio.activePositions')}</h3>
           </div>
-          <span className="text-[10px] font-mono text-muted-foreground">{positions.length} positions</span>
+          <span className="text-[10px] font-mono text-muted-foreground">{t('portfolio.positionsCount', { count: positions.length })}</span>
         </div>
 
         <div className="divide-y divide-border">
@@ -160,7 +162,7 @@ const PortfolioDashboard: React.FC = () => {
                   <p className="text-[11px] font-mono text-success">{pos.apy} APY</p>
                 </div>
                 <span className={`px-2 py-0.5 text-[10px] font-medium rounded-full border ${riskColors[pos.risk]}`}>
-                  {pos.risk}
+                  {t(`portfolio.risk.${pos.risk}`)}
                 </span>
               </div>
             </motion.div>
@@ -175,7 +177,7 @@ const PortfolioDashboard: React.FC = () => {
         transition={{ delay: 0.5 }}
         className="p-5 rounded-xl border border-border bg-card/50"
       >
-        <h3 className="text-sm font-semibold text-foreground mb-4">Chain Allocation</h3>
+        <h3 className="text-sm font-semibold text-foreground mb-4">{t('portfolio.chainAllocation')}</h3>
         <div className="space-y-3">
           {[
             { chain: 'Solana', pct: 85, value: `${solBalance.toFixed(2)} SOL` },

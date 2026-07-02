@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { MessageSquare, BarChart3, Lock, History, Mic } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import Header from '@/components/Header';
 import ChatInterface from '@/components/ChatInterface';
 import PortfolioDashboard from '@/components/PortfolioDashboard';
@@ -10,16 +11,19 @@ import TransactionHistory from '@/components/TransactionHistory';
 
 type TabKey = 'chat' | 'portfolio' | 'vault' | 'history';
 
-const tabs: { key: TabKey; label: string; icon: React.FC<{ className?: string }> }[] = [
-  { key: 'chat', label: 'AI Chat', icon: MessageSquare },
-  { key: 'portfolio', label: 'Portfolio', icon: BarChart3 },
-  { key: 'vault', label: 'Vault', icon: Lock },
-  { key: 'history', label: 'History', icon: History },
+const TAB_META: { key: TabKey; icon: React.FC<{ className?: string }> }[] = [
+  { key: 'chat', icon: MessageSquare },
+  { key: 'portfolio', icon: BarChart3 },
+  { key: 'vault', icon: Lock },
+  { key: 'history', icon: History },
 ];
 
 const Dashboard: React.FC = () => {
   const [activeTab, setActiveTab] = useState<TabKey>('chat');
   const navigate = useNavigate();
+  const { t } = useTranslation();
+
+  const tabs = TAB_META.map((tab) => ({ ...tab, label: t(`dashboard.tabs.${tab.key}`) }));
 
   const renderContent = () => {
     switch (activeTab) {
@@ -50,7 +54,7 @@ const Dashboard: React.FC = () => {
                 className="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium text-primary bg-primary/10 hover:bg-primary/15 transition-all whitespace-nowrap border border-primary/20 mr-1"
               >
                 <Mic className="w-4 h-4" />
-                Voice
+                {t('dashboard.tabs.voice')}
               </button>
               {tabs.map((tab) => (
                 <button

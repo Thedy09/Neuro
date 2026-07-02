@@ -7,6 +7,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useTranslation } from 'react-i18next';
 import { X, Zap, ExternalLink, AlertCircle } from 'lucide-react';
 
 const STORAGE_KEY = 'neuro_elevenlabs_agent_id';
@@ -39,6 +40,7 @@ export function storeAgentId(id: string) {
 }
 
 const VoiceConfigModal: React.FC<VoiceConfigModalProps> = ({ open, onClose, onConfirm }) => {
+  const { t } = useTranslation();
   const [agentId, setAgentId] = useState('');
 
   useEffect(() => {
@@ -47,6 +49,13 @@ const VoiceConfigModal: React.FC<VoiceConfigModalProps> = ({ open, onClose, onCo
       if (stored) setAgentId(stored);
     }
   }, [open]);
+
+  useEffect(() => {
+    if (!open) return;
+    const onKey = (e: KeyboardEvent) => e.key === 'Escape' && onClose();
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [open, onClose]);
 
   const handleSubmit = () => {
     const trimmed = agentId.trim();
@@ -69,6 +78,9 @@ const VoiceConfigModal: React.FC<VoiceConfigModalProps> = ({ open, onClose, onCo
 
           {/* Modal */}
           <motion.div
+            role="dialog"
+            aria-modal="true"
+            aria-label={t('voiceConfig.dialogLabel')}
             initial={{ opacity: 0, y: 20, scale: 0.95 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 20, scale: 0.95 }}
@@ -77,7 +89,8 @@ const VoiceConfigModal: React.FC<VoiceConfigModalProps> = ({ open, onClose, onCo
             {/* Close */}
             <button
               onClick={onClose}
-              className="absolute top-4 right-4 p-1 rounded-md text-muted-foreground hover:text-foreground transition-colors"
+              aria-label={t('common.close')}
+              className="absolute top-4 right-4 p-2 rounded-md text-muted-foreground hover:text-foreground active:scale-95 transition-all"
             >
               <X className="w-4 h-4" />
             </button>
@@ -88,25 +101,24 @@ const VoiceConfigModal: React.FC<VoiceConfigModalProps> = ({ open, onClose, onCo
             </div>
 
             <h3 className="text-lg font-semibold text-foreground mb-1">
-              Connect ElevenLabs Voice
+              {t('voiceConfig.title')}
             </h3>
             <p className="text-sm text-muted-foreground mb-5 leading-relaxed">
-              Enter your ElevenLabs Conversational AI Agent ID to enable real-time voice
-              interaction with NEURO.
+              {t('voiceConfig.subtitle')}
             </p>
 
             {/* Input */}
             <div className="space-y-3">
               <div>
                 <label className="text-xs font-medium text-muted-foreground uppercase tracking-wider block mb-1.5">
-                  Agent ID
+                  {t('voiceConfig.agentIdLabel')}
                 </label>
                 <input
                   type="text"
                   value={agentId}
                   onChange={(e) => setAgentId(e.target.value)}
                   onKeyDown={(e) => e.key === 'Enter' && handleSubmit()}
-                  placeholder="e.g. abc123def456..."
+                  placeholder={t('voiceConfig.placeholder')}
                   className="w-full px-3 py-2.5 rounded-lg border border-border bg-secondary/30 text-sm text-foreground placeholder:text-muted-foreground/50 outline-none focus:border-primary/50 transition-colors font-mono"
                 />
               </div>
@@ -116,8 +128,7 @@ const VoiceConfigModal: React.FC<VoiceConfigModalProps> = ({ open, onClose, onCo
                 <AlertCircle className="w-4 h-4 text-primary flex-shrink-0 mt-0.5" />
                 <div className="text-xs text-muted-foreground leading-relaxed">
                   <p className="mb-1">
-                    Create a free conversational AI agent at ElevenLabs, then paste the agent ID
-                    here. Your ID is stored locally in this browser only.
+                    {t('voiceConfig.info')}
                   </p>
                   <a
                     href="https://elevenlabs.io/conversational-ai"
@@ -125,7 +136,7 @@ const VoiceConfigModal: React.FC<VoiceConfigModalProps> = ({ open, onClose, onCo
                     rel="noopener noreferrer"
                     className="inline-flex items-center gap-1 text-primary hover:underline font-medium"
                   >
-                    Create Agent <ExternalLink className="w-3 h-3" />
+                    {t('voiceConfig.createAgent')} <ExternalLink className="w-3 h-3" />
                   </a>
                 </div>
               </div>
@@ -137,14 +148,14 @@ const VoiceConfigModal: React.FC<VoiceConfigModalProps> = ({ open, onClose, onCo
                 onClick={onClose}
                 className="flex-1 py-2.5 rounded-lg text-sm font-medium border border-border text-muted-foreground hover:text-foreground hover:bg-secondary/50 transition-all"
               >
-                Cancel
+                {t('common.cancel')}
               </button>
               <button
                 onClick={handleSubmit}
                 disabled={!agentId.trim()}
                 className="flex-1 py-2.5 rounded-lg text-sm font-medium bg-primary text-primary-foreground disabled:opacity-30 hover:opacity-90 transition-all"
               >
-                Start Voice
+                {t('voiceConfig.startVoice')}
               </button>
             </div>
           </motion.div>

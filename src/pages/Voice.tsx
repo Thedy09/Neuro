@@ -7,6 +7,7 @@
 
 import React, { useState, useRef, useEffect, useMemo, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   ArrowLeft,
@@ -119,30 +120,16 @@ const Particles: React.FC<{ isActive: boolean }> = ({ isActive }) => {
   );
 };
 
-// ── State labels ─────────────────────────────────────────────────────────────
-
-const STATE_LABELS: Record<VoiceState, string> = {
-  idle: 'Tap the orb to speak',
-  connecting: 'Connecting to NEURO...',
-  listening: 'Listening...',
-  processing: 'Processing your request...',
-  speaking: 'NEURO is responding...',
-};
-
-const STATE_HINTS: Record<VoiceState, string> = {
-  idle: '"Move 300 USDC from Base to Solana and optimize my yield"',
-  connecting: 'Establishing secure voice channel',
-  listening: 'Speak naturally — I understand DeFi commands',
-  processing: 'Analyzing intent and fetching routes...',
-  speaking: 'Responding via voice...',
-};
-
 // ── Main page component ──────────────────────────────────────────────────────
 
 const Voice: React.FC = () => {
   const navigate = useNavigate();
   const transcriptRef = useRef<HTMLDivElement>(null);
   const { publicKey } = useWallet();
+  const { t } = useTranslation();
+
+  const stateLabel = (state: VoiceState) => t(`voicePage.states.${state}`);
+  const stateHint = (state: VoiceState) => t(`voicePage.hints.${state}`);
 
   const [showConfig, setShowConfig] = useState(false);
   const [agentId, setAgentId] = useState<string>(getStoredAgentId() || '');
@@ -281,7 +268,7 @@ const Voice: React.FC = () => {
           className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors"
         >
           <ArrowLeft className="w-4 h-4" />
-          <span className="hidden sm:inline">Back</span>
+          <span className="hidden sm:inline">{t('voicePage.back')}</span>
         </button>
 
         <div className="flex items-center gap-2.5">
@@ -299,7 +286,7 @@ const Voice: React.FC = () => {
           )}
           {usage && usage.is_pro && (
             <span className="text-[10px] font-semibold text-primary px-2 py-0.5 rounded-full border border-primary/30 bg-primary/10 uppercase tracking-wider">
-              Pro
+              {t('voicePage.proBadge')}
             </span>
           )}
           {usage && !usage.is_pro && usage.limit > 0 && (
@@ -309,9 +296,9 @@ const Voice: React.FC = () => {
                   ? 'text-destructive border-destructive/30 bg-destructive/10'
                   : 'text-muted-foreground border-border'
               }`}
-              title="Free voice interactions remaining today"
+              title={t('voicePage.quotaTitle')}
             >
-              {usage.remaining}/{usage.limit} today
+              {t('voicePage.quotaToday', { remaining: usage.remaining, limit: usage.limit })}
             </span>
           )}
         </div>
@@ -319,8 +306,9 @@ const Voice: React.FC = () => {
         <div className="flex items-center gap-2">
           <button
             onClick={() => setShowConfig(true)}
-            className="p-2 rounded-lg text-muted-foreground hover:text-foreground hover:bg-secondary transition-all"
-            title="Voice settings"
+            aria-label={t('voicePage.settings')}
+            className="p-2 rounded-lg text-muted-foreground hover:text-foreground hover:bg-secondary active:scale-95 transition-all"
+            title={t('voicePage.settings')}
           >
             <Settings className="w-4 h-4" />
           </button>
@@ -329,7 +317,7 @@ const Voice: React.FC = () => {
             className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium text-muted-foreground border border-border hover:text-foreground hover:border-primary/30 transition-all"
           >
             <MessageSquare className="w-3.5 h-3.5" />
-            <span className="hidden sm:inline">Text Chat</span>
+            <span className="hidden sm:inline">{t('voicePage.textChat')}</span>
           </button>
         </div>
       </div>
@@ -343,7 +331,7 @@ const Voice: React.FC = () => {
           animate={{ opacity: 1, y: 0 }}
           className="text-xs font-mono text-muted-foreground uppercase tracking-[0.2em] mb-10 text-center"
         >
-          {STATE_LABELS[voice.state]}
+          {stateLabel(voice.state)}
         </motion.p>
 
         {/* Voice orb */}
@@ -380,7 +368,7 @@ const Voice: React.FC = () => {
           transition={{ delay: 0.2 }}
           className="mt-6 text-sm text-muted-foreground font-mono text-center max-w-md leading-relaxed"
         >
-          {STATE_HINTS[voice.state]}
+          {stateHint(voice.state)}
         </motion.p>
 
         {/* End call button (visible when active) */}
@@ -394,7 +382,7 @@ const Voice: React.FC = () => {
               className="mt-8 flex items-center gap-2 px-6 py-3 rounded-full bg-destructive/10 text-destructive border border-destructive/20 hover:bg-destructive/20 transition-all text-sm font-medium"
             >
               <PhoneOff className="w-4 h-4" />
-              End Session
+              {t('voicePage.endSession')}
             </motion.button>
           )}
         </AnimatePresence>
@@ -426,7 +414,7 @@ const Voice: React.FC = () => {
             </svg>
           </motion.div>
           <span className="text-[10px] font-medium text-muted-foreground uppercase tracking-wider">
-            Transcript{voice.transcripts.length > 0 && ` (${voice.transcripts.length})`}
+            {t('voicePage.transcript')}{voice.transcripts.length > 0 && ` (${voice.transcripts.length})`}
           </span>
         </button>
 
@@ -447,8 +435,8 @@ const Voice: React.FC = () => {
                 {voice.transcripts.length === 0 && (
                   <p className="text-xs text-muted-foreground text-center py-4 font-mono">
                     {isActive
-                      ? 'Waiting for conversation...'
-                      : 'Start a voice session to see transcripts here'}
+                      ? t('voicePage.waitingConversation')
+                      : t('voicePage.startSessionHint')}
                   </p>
                 )}
 
@@ -500,7 +488,7 @@ const Voice: React.FC = () => {
                     </div>
                     <div className="bg-secondary/50 border border-border rounded-xl rounded-tl-sm px-3 py-2 flex items-center gap-1.5">
                       <Loader2 className="w-3 h-3 text-primary animate-spin" />
-                      <span className="text-xs text-muted-foreground">Thinking...</span>
+                      <span className="text-xs text-muted-foreground">{t('common.thinking')}</span>
                     </div>
                   </motion.div>
                 )}
@@ -513,7 +501,7 @@ const Voice: React.FC = () => {
       {/* ── Bottom bar ──────────────────────────────────────────────────── */}
       <div className="relative z-10 px-6 py-3 flex items-center justify-center border-t border-border bg-card/20 backdrop-blur-sm">
         <p className="text-[10px] text-muted-foreground font-mono">
-          Voice powered by ElevenLabs Conversational AI
+          {t('voicePage.poweredBy')}
         </p>
       </div>
 

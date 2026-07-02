@@ -3,18 +3,20 @@ import { motion } from 'framer-motion';
 import { ArrowRight, Shield, Zap, Globe } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useWallet } from '@solana/wallet-adapter-react';
+import { useTranslation } from 'react-i18next';
 import VoiceOrb from './VoiceOrb';
 import { CLUSTER_LABEL } from '@/lib/solanaConfig';
-
-const features = [
-  { icon: Zap, label: 'AI-Powered', desc: 'Natural language DeFi execution' },
-  { icon: Globe, label: 'Cross-Chain', desc: 'Bridge any chain to Solana' },
-  { icon: Shield, label: 'Risk-Managed', desc: 'Smart vault risk scoring' },
-];
 
 const HeroSection: React.FC = () => {
   const navigate = useNavigate();
   const { connected } = useWallet();
+  const { t } = useTranslation();
+
+  const features = [
+    { icon: Zap, label: t('hero.features.ai.label'), desc: t('hero.features.ai.desc') },
+    { icon: Globe, label: t('hero.features.crossChain.label'), desc: t('hero.features.crossChain.desc') },
+    { icon: Shield, label: t('hero.features.risk.label'), desc: t('hero.features.risk.desc') },
+  ];
 
   return (
     <section className="relative min-h-screen flex items-center justify-center overflow-hidden pt-16">
@@ -35,7 +37,7 @@ const HeroSection: React.FC = () => {
         >
           <span className="w-1.5 h-1.5 rounded-full bg-success animate-pulse" />
           <span className="text-xs font-medium text-muted-foreground tracking-wide uppercase">
-            Solana {CLUSTER_LABEL} Live
+            {t('hero.badge', { cluster: CLUSTER_LABEL })}
           </span>
         </motion.div>
 
@@ -46,10 +48,10 @@ const HeroSection: React.FC = () => {
           transition={{ delay: 0.2, duration: 0.8 }}
           className="text-4xl sm:text-6xl lg:text-7xl font-bold tracking-tight leading-[1.1] mb-6"
         >
-          <span className="text-foreground">Your AI </span>
-          <span className="gradient-text">Wealth</span>
+          <span className="text-foreground">{t('hero.titleLine1')}</span>
+          <span className="gradient-text">{t('hero.titleGradient')}</span>
           <br />
-          <span className="text-foreground">Operating System</span>
+          <span className="text-foreground">{t('hero.titleLine2')}</span>
         </motion.h1>
 
         {/* Subtitle */}
@@ -59,8 +61,7 @@ const HeroSection: React.FC = () => {
           transition={{ delay: 0.4 }}
           className="text-lg sm:text-xl text-muted-foreground max-w-2xl mx-auto mb-10 leading-relaxed"
         >
-          Speak naturally. NEURO understands, bridges, deposits, and optimizes
-          your cross-chain yield on Solana.
+          {t('hero.subtitle')}
         </motion.p>
 
         {/* Voice Orb — links to fullscreen voice */}
@@ -73,7 +74,7 @@ const HeroSection: React.FC = () => {
         >
           <VoiceOrb size="lg" />
           <p className="text-xs text-muted-foreground mt-4 font-mono">
-            &quot;Move 300 USDC from Base to Solana and optimize my yield&quot;
+            {t('hero.orbHint')}
           </p>
         </motion.div>
 
@@ -88,14 +89,14 @@ const HeroSection: React.FC = () => {
             onClick={() => navigate(connected ? '/dashboard' : '#')}
             className="group flex items-center gap-2 px-6 py-3 rounded-lg font-medium text-sm transition-all duration-300 bg-primary text-primary-foreground hover:shadow-[0_0_30px_hsl(187_90%_51%/0.3)]"
           >
-            {connected ? 'Launch Dashboard' : 'Connect Wallet to Start'}
+            {connected ? t('hero.ctaConnected') : t('hero.ctaDisconnected')}
             <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
           </button>
           <button
             onClick={() => navigate('/voice')}
             className="flex items-center gap-2 px-6 py-3 rounded-lg font-medium text-sm text-muted-foreground border border-border hover:border-primary/30 hover:text-foreground transition-all duration-300"
           >
-            Try Voice Mode
+            {t('hero.ctaVoice')}
           </button>
         </motion.div>
 
