@@ -1,0 +1,35 @@
+<svg width="300" height="300" viewBox="0 0 300 300" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="NEURO">
+  <defs>
+    <linearGradient id="aGrad" x1="70" y1="210" x2="230" y2="60" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#16E0EE"/>
+      <stop offset="1" stop-color="#1AA6F5"/>
+    </linearGradient>
+    <radialGradient id="aBg" cx="0.5" cy="0.42" r="0.75">
+      <stop offset="0" stop-color="#0E141C"/>
+      <stop offset="1" stop-color="#06090D"/>
+    </radialGradient>
+    <radialGradient id="aGlow" cx="0.5" cy="0.5" r="0.5">
+      <stop offset="0" stop-color="#19D6F0" stop-opacity="0.45"/>
+      <stop offset="0.55" stop-color="#19A6F0" stop-opacity="0.08"/>
+      <stop offset="1" stop-color="#19A6F0" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+
+  <!-- full-bleed bg (LinkedIn crops to a circle) -->
+  <rect width="300" height="300" fill="url(#aBg)"/>
+  <circle cx="150" cy="146" r="150" fill="url(#aGlow)"/>
+
+  <!-- orbit ring + synapse nodes -->
+  <circle cx="150" cy="150" r="116" stroke="url(#aGrad)" stroke-opacity="0.28" stroke-width="3" fill="none"/>
+  <circle cx="238" cy="92"  r="9"  fill="#16E0EE"/>
+  <circle cx="64"  cy="206" r="7.5" fill="#7C5CFF"/>
+
+  <!-- the signal: voice waveform / rising wealth curve, centered -->
+  <g fill="url(#aGrad)">
+    <rect x="72"  y="142" width="20" height="54"  rx="10"/>
+    <rect x="106" y="100" width="20" height="96"  rx="10"/>
+    <rect x="140" y="124" width="20" height="72"  rx="10"/>
+    <rect x="174" y="80"  width="20" height="116" rx="10"/>
+    <rect x="208" y="56"  width="20" height="140" rx="10"/>
+  </g>
+</svg>

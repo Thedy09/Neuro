@@ -1,0 +1,59 @@
+<svg width="1128" height="191" viewBox="0 0 1128 191" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="NEURO — Your voice. Smart risk. Real yield.">
+  <defs>
+    <linearGradient id="cBg" x1="0" y1="0" x2="1128" y2="191" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#0A0F16"/>
+      <stop offset="1" stop-color="#06090D"/>
+    </linearGradient>
+    <linearGradient id="cGrad" x1="940" y1="170" x2="1100" y2="40" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#16E0EE"/>
+      <stop offset="1" stop-color="#1AA6F5"/>
+    </linearGradient>
+    <radialGradient id="cHalo" cx="0.5" cy="0.5" r="0.5">
+      <stop offset="0" stop-color="#19C6F0" stop-opacity="0.40"/>
+      <stop offset="0.55" stop-color="#1592F0" stop-opacity="0.06"/>
+      <stop offset="1" stop-color="#1592F0" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="cPlasma" cx="0.5" cy="0.5" r="0.5">
+      <stop offset="0" stop-color="#7C5CFF" stop-opacity="0.22"/>
+      <stop offset="1" stop-color="#7C5CFF" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+
+  <rect width="1128" height="191" fill="url(#cBg)"/>
+  <rect x="780" y="-120" width="560" height="520" fill="url(#cHalo)"/>
+  <ellipse cx="250" cy="120" rx="320" ry="220" fill="url(#cPlasma)"/>
+
+  <!-- quiet hairlines -->
+  <g stroke="#16E0EE" stroke-opacity="0.05" stroke-width="1">
+    <line x1="0" y1="48" x2="1128" y2="48"/>
+    <line x1="0" y1="143" x2="1128" y2="143"/>
+  </g>
+
+  <!-- SIGNATURE: waveform / rising-yield curve, right -->
+  <g fill="url(#cGrad)">
+    <rect x="930"  y="135" width="13" height="34"  rx="6.5"/>
+    <rect x="954"  y="110" width="13" height="59"  rx="6.5"/>
+    <rect x="978"  y="123" width="13" height="46"  rx="6.5"/>
+    <rect x="1002" y="92"  width="13" height="77"  rx="6.5"/>
+    <rect x="1026" y="104" width="13" height="65"  rx="6.5"/>
+    <rect x="1050" y="66"  width="13" height="103" rx="6.5"/>
+    <rect x="1074" y="48"  width="13" height="121" rx="6.5"/>
+  </g>
+  <circle cx="1080.5" cy="42" r="5" fill="#16E0EE"/>
+  <circle cx="936.5"  cy="129" r="4" fill="#7C5CFF"/>
+
+  <!-- eyebrow -->
+  <text x="232" y="66" font-family="JetBrains Mono Medium, monospace" font-size="13"
+        letter-spacing="5" fill="#5FB8C8">VOICE-FIRST AI WEALTH OS · SOLANA</text>
+
+  <!-- wordmark -->
+  <text x="230" y="128" font-family="Space Grotesk Bold, Space Grotesk" font-size="60"
+        letter-spacing="1.5" fill="#EAF6F9">NEUR<tspan fill="#16E0EE">O</tspan></text>
+
+  <!-- divider -->
+  <line x1="470" y1="78" x2="470" y2="128" stroke="#16E0EE" stroke-opacity="0.25" stroke-width="1.5"/>
+
+  <!-- slogan -->
+  <text x="496" y="110" font-family="Space Grotesk Medium, Space Grotesk" font-size="30"
+        letter-spacing="0.4" fill="#C7DDE4">Your voice. <tspan fill="#EAF6F9">Smart risk.</tspan> Real yield.</text>
+</svg>

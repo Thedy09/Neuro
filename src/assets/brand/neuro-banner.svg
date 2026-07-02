@@ -1,0 +1,76 @@
+<svg width="1200" height="630" viewBox="0 0 1200 630" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="NEURO — Talk to your money. Voice-first AI wealth OS on Solana.">
+  <defs>
+    <linearGradient id="bBg" x1="0" y1="0" x2="1200" y2="630" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#0A0F16"/>
+      <stop offset="1" stop-color="#06090D"/>
+    </linearGradient>
+    <linearGradient id="bGrad" x1="0" y1="630" x2="900" y2="120" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#16E0EE"/>
+      <stop offset="1" stop-color="#1AA6F5"/>
+    </linearGradient>
+    <radialGradient id="bHalo" cx="0.5" cy="0.5" r="0.5">
+      <stop offset="0" stop-color="#19C6F0" stop-opacity="0.42"/>
+      <stop offset="0.55" stop-color="#1592F0" stop-opacity="0.07"/>
+      <stop offset="1" stop-color="#1592F0" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="bPlasma" cx="0.5" cy="0.5" r="0.5">
+      <stop offset="0" stop-color="#7C5CFF" stop-opacity="0.30"/>
+      <stop offset="1" stop-color="#7C5CFF" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+
+  <rect width="1200" height="630" fill="url(#bBg)"/>
+  <!-- atmospheric light fields -->
+  <rect x="380" y="-160" width="900" height="900" fill="url(#bHalo)"/>
+  <ellipse cx="120" cy="560" rx="360" ry="300" fill="url(#bPlasma)"/>
+
+  <!-- hairline grid, quiet -->
+  <g stroke="#16E0EE" stroke-opacity="0.05" stroke-width="1">
+    <line x1="0" y1="157" x2="1200" y2="157"/>
+    <line x1="0" y1="472" x2="1200" y2="472"/>
+    <line x1="900" y1="0" x2="900" y2="630"/>
+  </g>
+
+  <!-- SIGNATURE: oversized voice-waveform / rising-wealth curve, right side -->
+  <g fill="url(#bGrad)" opacity="0.95">
+    <rect x="690"  y="430" width="22" height="70"  rx="11"/>
+    <rect x="730"  y="372" width="22" height="128" rx="11"/>
+    <rect x="770"  y="408" width="22" height="92"  rx="11"/>
+    <rect x="810"  y="320" width="22" height="180" rx="11"/>
+    <rect x="850"  y="356" width="22" height="144" rx="11"/>
+    <rect x="890"  y="262" width="22" height="238" rx="11"/>
+    <rect x="930"  y="300" width="22" height="200" rx="11"/>
+    <rect x="970"  y="196" width="22" height="304" rx="11"/>
+    <rect x="1010" y="244" width="22" height="256" rx="11"/>
+    <rect x="1050" y="140" width="22" height="360" rx="11"/>
+  </g>
+  <!-- trailing synapse nodes -->
+  <circle cx="1061" cy="120" r="6" fill="#16E0EE"/>
+  <circle cx="701"  cy="412" r="5" fill="#7C5CFF"/>
+
+  <!-- eyebrow -->
+  <text x="92" y="150" font-family="JetBrains Mono Medium, monospace" font-size="19"
+        letter-spacing="7" fill="#5FB8C8">VOICE-FIRST · SOLANA · AI WEALTH OS</text>
+
+  <!-- wordmark -->
+  <text x="88" y="280" font-family="Space Grotesk Bold, Space Grotesk" font-size="132"
+        letter-spacing="2" fill="#EAF6F9">NEUR<tspan fill="#16E0EE">O</tspan></text>
+
+  <!-- tagline -->
+  <text x="92" y="360" font-family="Space Grotesk Medium, Space Grotesk" font-size="44"
+        letter-spacing="0.5" fill="#C7DDE4">Your voice. <tspan fill="#EAF6F9">Smart risk.</tspan> Real yield.</text>
+
+  <!-- supporting line -->
+  <text x="92" y="410" font-family="Inter SemiBold, Inter, sans-serif" font-size="22"
+        fill="#7C99A4">Speak a command — NEURO scores risk, earns yield.</text>
+
+  <!-- footer chips -->
+  <g font-family="JetBrains Mono Medium, monospace" font-size="16" letter-spacing="1.5">
+    <rect x="92"  y="520" width="190" height="40" rx="20" fill="#16E0EE" fill-opacity="0.08" stroke="#16E0EE" stroke-opacity="0.25"/>
+    <text x="116" y="545" fill="#7FD6E2">ElevenLabs Voice</text>
+    <rect x="298" y="520" width="150" height="40" rx="20" fill="#16E0EE" fill-opacity="0.08" stroke="#16E0EE" stroke-opacity="0.25"/>
+    <text x="322" y="545" fill="#7FD6E2">PDA Vaults</text>
+    <rect x="464" y="520" width="168" height="40" rx="20" fill="#7C5CFF" fill-opacity="0.10" stroke="#7C5CFF" stroke-opacity="0.30"/>
+    <text x="488" y="545" fill="#B6A6FF">LI.FI Bridges</text>
+  </g>
+</svg>

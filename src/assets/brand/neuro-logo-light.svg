@@ -1,0 +1,30 @@
+<svg width="496" height="112" viewBox="0 0 496 112" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="NEURO — Your voice. Smart risk. Real yield.">
+  <defs>
+    <linearGradient id="llGrad" x1="20" y1="84" x2="68" y2="28" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#0FB9C8"/>
+      <stop offset="1" stop-color="#1487D6"/>
+    </linearGradient>
+  </defs>
+
+  <!-- MARK -->
+  <g transform="translate(12,16) scale(1.25)">
+    <circle cx="32" cy="32" r="26" stroke="url(#llGrad)" stroke-opacity="0.35" stroke-width="1.5" fill="none"/>
+    <circle cx="55" cy="20" r="2.4" fill="#0FB9C8"/>
+    <circle cx="11" cy="46" r="2.0" fill="#6A45F0"/>
+    <g fill="url(#llGrad)">
+      <rect x="14" y="34" width="4.4" height="12" rx="2.2"/>
+      <rect x="22" y="24" width="4.4" height="22" rx="2.2"/>
+      <rect x="30" y="30" width="4.4" height="16" rx="2.2"/>
+      <rect x="38" y="19" width="4.4" height="27" rx="2.2"/>
+      <rect x="46" y="13" width="4.4" height="33" rx="2.2"/>
+    </g>
+  </g>
+
+  <!-- WORDMARK -->
+  <text x="120" y="58" font-family="Space Grotesk Bold, Space Grotesk" font-size="50"
+        letter-spacing="2" fill="#0B1117">NEUR<tspan fill="#0FB9C8">O</tspan></text>
+
+  <!-- TAGLINE -->
+  <text x="122" y="84" font-family="JetBrains Mono Medium, monospace" font-size="12"
+        letter-spacing="2.6" fill="#3E7C88">YOUR VOICE · SMART RISK · REAL YIELD</text>
+</svg>

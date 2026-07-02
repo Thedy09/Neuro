@@ -1,0 +1,32 @@
+<svg width="160" height="160" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="NEURO">
+  <defs>
+    <linearGradient id="nGrad" x1="14" y1="50" x2="50" y2="12" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#16E0EE"/>
+      <stop offset="1" stop-color="#1AA6F5"/>
+    </linearGradient>
+    <radialGradient id="nGlow" cx="0.5" cy="0.5" r="0.5">
+      <stop offset="0" stop-color="#19D6F0" stop-opacity="0.55"/>
+      <stop offset="0.55" stop-color="#19A6F0" stop-opacity="0.10"/>
+      <stop offset="1" stop-color="#19A6F0" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+
+  <!-- ambient glow -->
+  <circle cx="32" cy="32" r="30" fill="url(#nGlow)"/>
+
+  <!-- neural orbit ring -->
+  <circle cx="32" cy="32" r="26" stroke="url(#nGrad)" stroke-opacity="0.30" stroke-width="1.5" fill="none"/>
+
+  <!-- orbiting synapse nodes: cyan signal + plasma-violet intelligence -->
+  <circle cx="55" cy="20" r="2.4" fill="#16E0EE"/>
+  <circle cx="11" cy="46" r="2.0" fill="#7C5CFF"/>
+
+  <!-- the signal: a voice waveform that is also a rising wealth curve -->
+  <g fill="url(#nGrad)">
+    <rect x="14" y="34" width="4.4" height="12" rx="2.2"/>
+    <rect x="22" y="24" width="4.4" height="22" rx="2.2"/>
+    <rect x="30" y="30" width="4.4" height="16" rx="2.2"/>
+    <rect x="38" y="19" width="4.4" height="27" rx="2.2"/>
+    <rect x="46" y="13" width="4.4" height="33" rx="2.2"/>
+  </g>
+</svg>
